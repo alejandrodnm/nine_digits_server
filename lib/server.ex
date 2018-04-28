@@ -6,15 +6,12 @@ defmodule Server do
   """
   use GenServer
 
-  def start_link do
+  def start_link(opts) do
     ip = Application.get_env(:nine_digits, :ip)
     port = Application.get_env(:nine_digits, :port)
-    GenServer.start_link(__MODULE__, [ip: ip, port: port], [])
+    GenServer.start_link(__MODULE__, [ip: ip, port: port], opts)
   end
 
-  @doc """
-
-  """
   @spec ip_to_str(tuple()) :: String.t()
   defp ip_to_str(ip) do
     ip
@@ -22,6 +19,9 @@ defmodule Server do
     |> Enum.join(".")
   end
 
+  @doc """
+  Sets a socket on the port defined on the config
+  """
   def init(ip: ip, port: port) do
     case :gen_tcp.listen(port, [
            :binary,
@@ -30,11 +30,11 @@ defmodule Server do
            reuseaddr: true
          ]) do
       {:ok, listen_socket} ->
-        Logger.info(
+        Logger.debug(fn ->
           "Accepting connections on ip #{ip_to_str(ip)} and port #{port}"
-        )
+        end)
 
-        {:ok, listen_socket}
+        {:ok, %{ip: ip, port: port, listen_socket: listen_socket}}
 
       {:error, reason} ->
         Logger.error(
@@ -45,5 +45,20 @@ defmodule Server do
 
         {:error, reason}
     end
+  end
+
+  @doc """
+  Returns the listen socket used for accepting connections
+  """
+  def listen_socket(server) do
+    GenServer.call(server, {:listen_socket})
+  end
+
+  def handle_call(
+        {:listen_socket},
+        _from,
+        %{listen_socket: listen_socket} = state
+      ) do
+    {:reply, listen_socket, state}
   end
 end
