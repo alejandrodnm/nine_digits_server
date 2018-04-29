@@ -2,7 +2,9 @@ require Logger
 
 defmodule Connection do
   @moduledoc """
-  Handles client connections
+  Handles client accepted connections. If the Server if shutdown, the
+  connections will be restared and request the new listen_socket to the
+  new Server.
   """
   use GenServer
 
@@ -53,10 +55,7 @@ defmodule Connection do
     {:noreply, new_state}
   end
 
-  def handle_info(
-        {:tcp_error, _, reason},
-        [listen_socket: listen_socket] = state
-      ) do
+  def handle_info({:tcp_error, _, reason}, state) do
     Logger.debug(fn ->
       "#{inspect(self())}: connection closed due to #{reason}"
     end)
