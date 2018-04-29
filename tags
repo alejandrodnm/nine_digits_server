@@ -187,7 +187,6 @@ Name	deps/credo/lib/credo/code/name.ex	/^defmodule Credo.Code.Name do$/;"	m	lang
 NegatedConditionsInUnless	deps/credo/lib/credo/check/refactor/negated_conditions_in_unless.ex	/^defmodule Credo.Check.Refactor.NegatedConditionsInUnless do$/;"	m	language:Elixir
 NegatedConditionsWithElse	deps/credo/lib/credo/check/refactor/negated_conditions_with_else.ex	/^defmodule Credo.Check.Refactor.NegatedConditionsWithElse do$/;"	m	language:Elixir
 Nesting	deps/credo/lib/credo/check/refactor/nesting.ex	/^defmodule Credo.Check.Refactor.Nesting do$/;"	m	language:Elixir
-NineDigits	lib/nine_digits.ex	/^defmodule NineDigits do$/;"	m	language:Elixir
 Oneline	deps/credo/lib/credo/cli/command/list/output/oneline.ex	/^defmodule Credo.CLI.Command.List.Output.Oneline do$/;"	m	language:Elixir
 Oneline	deps/credo/lib/credo/cli/command/suggest/output/oneline.ex	/^defmodule Credo.CLI.Command.Suggest.Output.Oneline do$/;"	m	language:Elixir
 Oneline	deps/credo/lib/credo/cli/output/formatter/oneline.ex	/^defmodule Credo.CLI.Output.Formatter.Oneline do$/;"	m	language:Elixir
@@ -359,6 +358,7 @@ abstract_string	deps/parse_trans/src/ct_expand.erl	/^abstract_string([C|T], Stri
 abstract_string	deps/parse_trans/src/ct_expand.erl	/^abstract_string([], String) ->$/;"	f	language:Erlang	module:ct_expand
 accept connections	test/server_test.exs	/^  test "accept connections" do$/;"	t	language:Elixir
 accept connections 2	test/server_test.exs	/^  test "accept connections 2" do$/;"	t	language:Elixir
+accept_connection	lib/connection.ex	/^  defp accept_connection(listen_socket) do$/;"	f	language:Elixir
 accept_ext	deps/hackney/src/hackney_headers.erl	/^accept_ext(Data, Fun, Type, SubType, Params, Quality, Acc) ->$/;"	f	language:Erlang	module:hackney_headers
 accept_ext_attr	deps/hackney/src/hackney_headers.erl	/^accept_ext_attr(Data, Fun, Type, SubType, Params, Quality, Acc) ->$/;"	f	language:Erlang	module:hackney_headers
 accept_ext_value	deps/hackney/src/hackney_headers.erl	/^accept_ext_value(Data, Fun, Type, SubType, Params, Quality, Acc, Attr) ->$/;"	f	language:Erlang	module:hackney_headers
@@ -7905,10 +7905,10 @@ handle_info	deps/hackney/src/hackney_pool.erl	/^handle_info({tcp, Socket, _}, St
 handle_info	deps/hackney/src/hackney_pool.erl	/^handle_info({tcp_closed, Socket}, State) ->$/;"	f	language:Erlang	module:hackney_pool
 handle_info	deps/hackney/src/hackney_pool.erl	/^handle_info({tcp_error, Socket, _}, State) ->$/;"	f	language:Erlang	module:hackney_pool
 handle_info	deps/hackney/src/hackney_pool.erl	/^handle_info({timeout, Socket}, State) ->$/;"	f	language:Erlang	module:hackney_pool
+handle_info	lib/connection.ex	/^  def handle_info($/;"	f	language:Elixir
 handle_info	lib/connection.ex	/^  def handle_info(:started, _) do$/;"	f	language:Elixir
 handle_info	lib/connection.ex	/^  def handle_info({:tcp, socket, packet}, state) do$/;"	f	language:Elixir
 handle_info	lib/connection.ex	/^  def handle_info({:tcp_closed, _}, state) do$/;"	f	language:Elixir
-handle_info	lib/connection.ex	/^  def handle_info({:tcp_error, _, reason}, state) do$/;"	f	language:Elixir
 handle_multipart_body	deps/hackney/src/hackney_request.erl	/^handle_multipart_body(Headers, ReqType, CLen, Boundary, Client) ->$/;"	f	language:Erlang	module:hackney_request
 handle_multipart_body	deps/hackney/src/hackney_request.erl	/^handle_multipart_body(Headers, ReqType, CLen, Client) ->$/;"	f	language:Erlang	module:hackney_request
 handle_multipart_body	deps/hackney/src/hackney_request.erl	/^handle_multipart_body(Headers, ReqType, Client) ->$/;"	f	language:Erlang	module:hackney_request
@@ -12687,6 +12687,7 @@ send	deps/hackney/src/hackney_request.erl	/^send(#client{transport=Transport, so
 send	deps/hackney/src/hackney_socks5.erl	/^send({Transport, Socket}, Packet) ->$/;"	f	language:Erlang	module:hackney_socks5
 send	deps/hackney/src/hackney_ssl.erl	/^send(Socket, Packet) ->$/;"	f	language:Erlang	module:hackney_ssl
 send	deps/hackney/src/hackney_tcp.erl	/^send(Socket, Packet) ->$/;"	f	language:Erlang	module:hackney_tcp
+send message to server	test/server_test.exs	/^  test "send message to server" do$/;"	t	language:Elixir
 send_body	deps/hackney/src/hackney.erl	/^send_body(Ref, Body) ->$/;"	f	language:Erlang	module:hackney
 send_chunk	deps/hackney/src/hackney_request.erl	/^send_chunk(Client, Data) ->$/;"	f	language:Erlang	module:hackney_request
 send_file	deps/excoveralls/lib/excoveralls/poster.ex	/^  defp send_file(file_name, options) do$/;"	f	language:Elixir
@@ -12816,7 +12817,6 @@ start	deps/jsx/src/jsx_decoder.erl	/^start(<<16#ef, 16#bb>>, Handler, Stack, Con
 start	deps/jsx/src/jsx_decoder.erl	/^start(<<16#ef>>, Handler, Stack, Config) ->$/;"	f	language:Erlang	module:jsx_decoder
 start	deps/jsx/src/jsx_decoder.erl	/^start(<<>>, Handler, Stack, Config) ->$/;"	f	language:Erlang	module:jsx_decoder
 start	deps/jsx/src/jsx_decoder.erl	/^start(Bin, Handler, Stack, Config) ->$/;"	f	language:Erlang	module:jsx_decoder
-start	lib/nine_digits.ex	/^  def start(_type, _args) do$/;"	f	language:Elixir
 start	lib/nine_digits/application.ex	/^  def start(_type, _args) do$/;"	f	language:Elixir
 start_array	deps/jsx/src/jsx_decoder.erl	/^-define(start_array, 16#5B).$/;"	d	language:Erlang
 start_array	deps/jsx/src/jsx_to_json.erl	/^-define(start_array, <<"[">>).$/;"	d	language:Erlang

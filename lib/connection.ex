@@ -26,13 +26,9 @@ defmodule Connection do
       "#{inspect(self())}: waiting connection"
     end)
 
-    {:ok, socket} = :gen_tcp.accept(listen_socket)
-
-    Logger.debug(fn ->
-      "#{inspect(self())}: connection stablished"
-    end)
-
-    {:noreply, [socket: socket, listen_socket: listen_socket]}
+    socket = accept_connection(listen_socket)
+    state = [socket: socket, listen_socket: listen_socket]
+    {:noreply, state}
   end
 
   def handle_info({:tcp, socket, packet}, state) do
@@ -40,7 +36,6 @@ defmodule Connection do
       "#{inspect(self())}: received #{packet}"
     end)
 
-    :gen_tcp.send(socket, "message recived")
     {:noreply, state}
   end
 
@@ -49,14 +44,41 @@ defmodule Connection do
       "#{inspect(self())}: connection closed"
     end)
 
-    {:noreply, state}
+    socket =
+      state
+      |> Keyword.get(:listen_socket)
+      |> accept_connection
+
+    new_state = Keyword.put(state, :socket, socket)
+    {:noreply, new_state}
   end
 
-  def handle_info({:tcp_error, _, reason}, state) do
+  def handle_info(
+        {:tcp_error, _, reason},
+        [listen_socket: listen_socket] = state
+      ) do
     Logger.debug(fn ->
       "#{inspect(self())}: connection closed due to #{reason}"
     end)
 
-    {:noreply, state}
+    socket =
+      state
+      |> Keyword.get(:listen_socket)
+      |> accept_connection
+
+    new_state = Keyword.put(state, :socket, socket)
+    {:noreply, new_state}
+  end
+
+  @spec accept_connection(port()) :: port()
+  defp accept_connection(listen_socket) do
+    # If it fails the supervisor will restart it
+    {:ok, socket} = :gen_tcp.accept(listen_socket)
+
+    Logger.debug(fn ->
+      "#{inspect(self())}: connection stablished"
+    end)
+
+    socket
   end
 end
