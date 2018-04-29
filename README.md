@@ -1,6 +1,11 @@
 # NineDigits
 
-TCP server for reciving nine numbers
+TCP server for reciving nine numbers/
+
+## Asumptions
+
+Clients will not sit idle, so connections will be close based on the TCP
+implementation of the host machine.
 
 ## Installation
 

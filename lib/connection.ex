@@ -7,6 +7,7 @@ defmodule Connection do
   new Server.
   """
   use GenServer
+  @carriage_return "\n"
 
   def start_link(opts) do
     GenServer.start_link(__MODULE__, [], opts)
@@ -33,12 +34,32 @@ defmodule Connection do
     {:noreply, state}
   end
 
-  def handle_info({:tcp, socket, packet}, state) do
+  def handle_info(
+        {:tcp, _socket, packet},
+        [socket: socket, listen_socket: listen_socket] = state
+      ) do
     Logger.debug(fn ->
       "#{inspect(self())}: received #{packet}"
     end)
 
-    {:noreply, state}
+    case parse_packet(packet) do
+      {:ok, input} ->
+        Logger.debug(fn ->
+          "#{inspect(self())}: valid packet #{input}"
+        end)
+
+        {:noreply, state}
+
+      {:error, _} ->
+        Logger.debug(fn ->
+          "#{inspect(self())}: invalid packet #{packet} closing connection"
+        end)
+
+        :ok = :gen_tcp.close(socket)
+        new_socket = accept_connection(listen_socket)
+
+        {:noreply, [socket: new_socket, listen_socket: listen_socket]}
+    end
   end
 
   def handle_info({:tcp_closed, _}, state) do
@@ -79,5 +100,18 @@ defmodule Connection do
     end)
 
     socket
+  end
+
+  @spec parse_packet(String.t()) :: {:ok, String.t()} | {:error, nil}
+  def parse_packet(packet) do
+    if String.last(packet) == @carriage_return and String.length(packet) == 10 do
+      try do
+        {:ok, String.to_int(packet)}
+      rescue
+        ArgumentError -> {:error, nil}
+      end
+    else
+      {:error, nil}
+    end
   end
 end

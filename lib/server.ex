@@ -25,7 +25,6 @@ defmodule Server do
   def init(ip: ip, port: port) do
     case :gen_tcp.listen(port, [
            :binary,
-           packet: :line,
            active: true,
            reuseaddr: true
          ]) do
