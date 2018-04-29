@@ -31,4 +31,19 @@ defmodule ConnectionTest do
     :ok = :gen_tcp.send(socket, "12345678\n")
     {:error, :closed} = :gen_tcp.recv(socket, 0)
   end
+
+  test "send message to server with length > 9, server closes connection", %{
+    socket: socket
+  } do
+    :ok = :gen_tcp.send(socket, "1234567890\n")
+    {:error, :closed} = :gen_tcp.recv(socket, 0)
+  end
+
+  test "send message to server with data after the carriage return, server closes connection",
+       %{
+         socket: socket
+       } do
+    :ok = :gen_tcp.send(socket, "123456789\n0")
+    {:error, :closed} = :gen_tcp.recv(socket, 0)
+  end
 end

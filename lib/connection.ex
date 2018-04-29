@@ -42,15 +42,15 @@ defmodule Connection do
       "#{inspect(self())}: received #{packet}"
     end)
 
-    case parse_packet(packet) do
-      {:ok, input} ->
+    case Regex.named_captures(~r/^(?<input>[0-9]{9})\n$/, packet) do
+      %{"input" => input} ->
         Logger.debug(fn ->
           "#{inspect(self())}: valid packet #{input}"
         end)
 
         {:noreply, state}
 
-      {:error, _} ->
+      nil ->
         Logger.debug(fn ->
           "#{inspect(self())}: invalid packet #{packet} closing connection"
         end)
@@ -100,18 +100,5 @@ defmodule Connection do
     end)
 
     socket
-  end
-
-  @spec parse_packet(String.t()) :: {:ok, String.t()} | {:error, nil}
-  def parse_packet(packet) do
-    if String.last(packet) == @carriage_return and String.length(packet) == 10 do
-      try do
-        {:ok, String.to_int(packet)}
-      rescue
-        ArgumentError -> {:error, nil}
-      end
-    else
-      {:error, nil}
-    end
   end
 end

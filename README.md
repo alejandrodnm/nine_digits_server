@@ -7,6 +7,9 @@ TCP server for reciving nine numbers/
 Clients will not sit idle, so connections will be close based on the TCP
 implementation of the host machine.
 
+Uses dets instead of ets in order to restore the state of the run if the application
+crashes.
+
 ## Installation
 
 Elixir 1.6
