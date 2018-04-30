@@ -23,3 +23,5 @@ erl_crash.dump
 nine_digits-*.tar
 
 tags
+
+numbers.log

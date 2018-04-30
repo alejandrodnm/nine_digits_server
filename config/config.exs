@@ -29,4 +29,8 @@ use Mix.Config
 #
 #     import_config "#{Mix.env}.exs"
 
-config :nine_digits, ip: {127, 0, 0, 1}, port: 4000, concurrency: 5
+config :nine_digits,
+  ip: {127, 0, 0, 1},
+  port: 4000,
+  concurrency: 5,
+  file_path: "numbers.log"

@@ -12,13 +12,6 @@ defmodule Server do
     GenServer.start_link(__MODULE__, [ip: ip, port: port], opts)
   end
 
-  @spec ip_to_str(tuple()) :: String.t()
-  defp ip_to_str(ip) do
-    ip
-    |> Tuple.to_list()
-    |> Enum.join(".")
-  end
-
   @doc """
   Sets a socket on the port defined on the config
   """
@@ -35,20 +28,21 @@ defmodule Server do
 
         {:ok, %{ip: ip, port: port, listen_socket: listen_socket}}
 
-      {:error, reason} ->
+      {:error, reason} = err ->
         Logger.error(
           "#{reason}: Couldn't open socket on ip #{ip_to_str(ip)} and port #{
             port
           }"
         )
 
-        {:error, reason}
+        {:stop, reason}
     end
   end
 
   @doc """
   Returns the listen socket used for accepting connections
   """
+  @spec listen_socket(GenServer.server()) :: port()
   def listen_socket(server) do
     GenServer.call(server, {:listen_socket})
   end
@@ -59,5 +53,12 @@ defmodule Server do
         %{listen_socket: listen_socket} = state
       ) do
     {:reply, listen_socket, state}
+  end
+
+  @spec ip_to_str(tuple()) :: String.t()
+  defp ip_to_str(ip) do
+    ip
+    |> Tuple.to_list()
+    |> Enum.join(".")
   end
 end

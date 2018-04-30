@@ -34,6 +34,10 @@ defmodule Connection do
     {:noreply, state}
   end
 
+  @doc """
+  Handles messages from the clients, packets received must be 9 digits
+  followed by a carriage return, otherwise the connection will be close.
+  """
   def handle_info(
         {:tcp, _socket, packet},
         [socket: socket, listen_socket: listen_socket] = state
@@ -48,6 +52,7 @@ defmodule Connection do
           "#{inspect(self())}: valid packet #{input}"
         end)
 
+        FileHandler.append_line(FileHandler, input)
         {:noreply, state}
 
       nil ->
