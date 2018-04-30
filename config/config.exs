@@ -33,4 +33,6 @@ config :nine_digits,
   ip: {127, 0, 0, 1},
   port: 4000,
   concurrency: 5,
-  file_path: "numbers.log"
+  file_path: "numbers.log",
+  # if true sends a response to the clients after procesing the item
+  tcp_response: false

@@ -53,9 +53,7 @@ defmodule Connection do
 
         process_item(item)
 
-        # On the test environment we block for a response to avoid
-        # race conditions on assertions
-        if Mix.env() == :test do
+        if Application.get_env(:nine_digits, :tcp_response) do
           :gen_tcp.send(socket, "ok")
         end
 
@@ -115,12 +113,12 @@ defmodule Connection do
 
   @spec process_item(String.t()) :: :ok
   defp process_item(item) do
-    # FIXME Update the current counter
-
     if :ets.insert_new(:repo, {item, true}) do
+      :ets.update_counter(:counter, :new, 1, {:new, 0})
       FileHandler.append_line(FileHandler, item)
       :ok
     else
+      :ets.update_counter(:counter, :duplicates, 1, {:duplicates, 0})
       :ok
     end
   end

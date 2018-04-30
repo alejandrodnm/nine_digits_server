@@ -2,7 +2,12 @@ defmodule Connection.ProcessTest do
   use ExUnit.Case
 
   setup do
+    on_exit(fn ->
+      Application.put_env(:nine_digits, :tcp_response, false)
+    end)
+
     Application.stop(:nine_digits)
+    Application.put_env(:nine_digits, :tcp_response, true)
     Application.start(:nine_digits)
     file_path = Application.get_env(:nine_digits, :file_path)
     ip = Application.get_env(:nine_digits, :ip)
@@ -10,48 +15,54 @@ defmodule Connection.ProcessTest do
     [ip: ip, port: port, file_path: file_path]
   end
 
-  test "new items are stored in the ets table, increase the counter and are written to disk",
+  test "new items are stored in the ets table, increase the new counter and are written to disk",
        %{
          ip: ip,
          port: port,
          file_path: file_path
        } do
+    {:ok, socket} = :gen_tcp.connect(ip, port, [:binary, active: false])
+
     items =
       for n <- 1..3 do
-        "12345678#{n}"
+        item = "12345678#{n}"
+        :ok = :gen_tcp.send(socket, "#{item}\r\n")
+        {:ok, "ok"} = :gen_tcp.recv(socket, 0)
+        item
       end
 
-    # We create 3 separate connections and run the execution on parallel
-    items
-    |> Task.async_stream(fn item ->
-      {:ok, socket_} = :gen_tcp.connect(ip, port, [:binary, active: false])
-      :ok = :gen_tcp.send(socket_, "#{item}\r\n")
-      {:ok, "ok"} = :gen_tcp.recv(socket_, 0)
-      :gen_tcp.close(socket_)
-    end)
-    |> Enum.to_list()
+    :gen_tcp.close(socket)
 
     joined_items = Enum.join(items, "\n") <> "\n"
     {:ok, ^joined_items} = File.read(file_path)
     assert :ets.lookup(:repo, items)
+    assert :ets.lookup(:counter, :new) == [new: 3]
+    assert :ets.lookup(:counter, :duplicates) == [duplicates: 0]
     assert :ets.info(:repo, :size) == 3
   end
 
-  test "duplicated items only increase the counter", %{
+  test "duplicated items only increase the duplicates counter", %{
     ip: ip,
     port: port,
     file_path: file_path
   } do
     {:ok, socket} = :gen_tcp.connect(ip, port, [:binary, active: false])
     item = "123456789"
-    :ok = :gen_tcp.send(socket, "#{item}\r\n")
-    {:ok, "ok"} = :gen_tcp.recv(socket, 0)
-    :ok = :gen_tcp.send(socket, "#{item}\r\n")
-    {:ok, "ok"} = :gen_tcp.recv(socket, 0)
-    :gen_tcp.close(socket)
+
+    1..3
+    |> Task.async_stream(fn _ ->
+      {:ok, socket} = :gen_tcp.connect(ip, port, [:binary, active: false])
+      :ok = :gen_tcp.send(socket, "#{item}\r\n")
+      {:ok, "ok"} = :gen_tcp.recv(socket, 0)
+      :gen_tcp.close(socket)
+    end)
+    |> Enum.to_list()
+
     read_item = item <> "\n"
     {:ok, ^read_item} = File.read(file_path)
     assert :ets.lookup(:repo, item) == [{item, true}]
     assert :ets.info(:repo, :size) == 1
+    assert :ets.lookup(:counter, :new) == [new: 1]
+    assert :ets.lookup(:counter, :duplicates) == [duplicates: 2]
   end
 end
