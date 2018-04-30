@@ -43,7 +43,7 @@ defmodule ConnectionTest do
        %{
          socket: socket
        } do
-    :ok = :gen_tcp.send(socket, "123456789\n0")
+    :ok = :gen_tcp.send(socket, "123456789\r\n0123456789\n")
     {:error, :closed} = :gen_tcp.recv(socket, 0)
   end
 end

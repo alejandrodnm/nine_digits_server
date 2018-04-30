@@ -7,7 +7,6 @@ defmodule Connection do
   new Server.
   """
   use GenServer
-  @carriage_return "\n"
 
   def start_link(opts) do
     GenServer.start_link(__MODULE__, [], opts)
@@ -46,7 +45,7 @@ defmodule Connection do
       "#{inspect(self())}: received #{packet}"
     end)
 
-    case Regex.named_captures(~r/^(?<input>[0-9]{9})\n$/, packet) do
+    case Regex.named_captures(~r/^(?<input>[0-9]{9})(\r\n|\r|\n)$/, packet) do
       %{"input" => input} ->
         Logger.debug(fn ->
           "#{inspect(self())}: valid packet #{input}"
