@@ -1,4 +1,4 @@
-defmodule ConnectionTest do
+defmodule Connection.ValidationTest do
   use ExUnit.Case
 
   setup do

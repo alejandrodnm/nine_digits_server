@@ -11,6 +11,7 @@ defmodule NineDigits.Supervisor do
   def init(:ok) do
     children = [
       {FileHandler, name: FileHandler},
+      {Repo, name: Repo},
       {Server, name: Server},
       Connection.Supervisor
     ]

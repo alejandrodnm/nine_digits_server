@@ -45,13 +45,20 @@ defmodule Connection do
       "#{inspect(self())}: received #{packet}"
     end)
 
-    case Regex.named_captures(~r/^(?<input>[0-9]{9})(\r\n|\r|\n)$/, packet) do
-      %{"input" => input} ->
+    case Regex.named_captures(~r/^(?<item>[0-9]{9})(\r\n|\r|\n)$/, packet) do
+      %{"item" => item} ->
         Logger.debug(fn ->
-          "#{inspect(self())}: valid packet #{input}"
+          "#{inspect(self())}: valid packet #{item}"
         end)
 
-        FileHandler.append_line(FileHandler, input)
+        process_item(item)
+
+        # On the test environment we block for a response to avoid
+        # race conditions on assertions
+        if Mix.env() == :test do
+          :gen_tcp.send(socket, "ok")
+        end
+
         {:noreply, state}
 
       nil ->
@@ -104,5 +111,17 @@ defmodule Connection do
     end)
 
     socket
+  end
+
+  @spec process_item(String.t()) :: :ok
+  defp process_item(item) do
+    # FIXME Update the current counter
+
+    if :ets.insert_new(:repo, {item, true}) do
+      FileHandler.append_line(FileHandler, item)
+      :ok
+    else
+      :ok
+    end
   end
 end
