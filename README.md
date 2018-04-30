@@ -1,6 +1,6 @@
 # NineDigits
 
-TCP server for reciving nine numbers/
+TCP server for reciving nine digits numbers
 
 ## Asumptions
 
