@@ -16,9 +16,9 @@ defmodule Connection do
     GenServer.start_link(__MODULE__, [], opts)
   end
 
-  def init(state) do
+  def init(_args) do
     Process.send_after(self(), :started, 0)
-    {:ok, state}
+    {:ok, []}
   end
 
   @doc """
@@ -75,32 +75,30 @@ defmodule Connection do
     end
   end
 
-  def handle_info({:tcp_closed, _}, state) do
+  def handle_info(
+        {:tcp_closed, _},
+        socket: _socket,
+        listen_socket: listen_socket
+      ) do
     Logger.debug(fn ->
       "#{inspect(self())}: connection closed"
     end)
 
-    socket =
-      state
-      |> Keyword.get(:listen_socket)
-      |> accept_connection
-
-    new_state = Keyword.put(state, :socket, socket)
-    {:noreply, new_state}
+    socket = accept_connection(listen_socket)
+    {:noreply, [socket: socket, listen_socket: listen_socket]}
   end
 
-  def handle_info({:tcp_error, _, reason}, state) do
+  def handle_info(
+        {:tcp_error, _, reason},
+        socket: _socket,
+        listen_socket: listen_socket
+      ) do
     Logger.debug(fn ->
       "#{inspect(self())}: connection closed due to #{reason}"
     end)
 
-    socket =
-      state
-      |> Keyword.get(:listen_socket)
-      |> accept_connection
-
-    new_state = Keyword.put(state, :socket, socket)
-    {:noreply, new_state}
+    socket = accept_connection(listen_socket)
+    {:noreply, [socket: socket, listen_socket: listen_socket]}
   end
 
   @spec accept_connection(port()) :: port()
