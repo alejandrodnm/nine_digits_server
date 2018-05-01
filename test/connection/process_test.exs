@@ -2,12 +2,7 @@ defmodule Connection.ProcessTest do
   use ExUnit.Case
 
   setup do
-    on_exit(fn ->
-      Application.put_env(:nine_digits, :tcp_response, false)
-    end)
-
     Application.stop(:nine_digits)
-    Application.put_env(:nine_digits, :tcp_response, true)
     Application.start(:nine_digits)
     file_path = Application.get_env(:nine_digits, :file_path)
     ip = Application.get_env(:nine_digits, :ip)

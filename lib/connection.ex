@@ -8,6 +8,10 @@ defmodule Connection do
   """
   use GenServer
 
+  # if true the connections will send a response to the
+  # clients after procesing an item
+  @tcp_response Application.get_env(:nine_digits, :tcp_response, false)
+
   def start_link(opts) do
     GenServer.start_link(__MODULE__, [], opts)
   end
@@ -53,7 +57,7 @@ defmodule Connection do
 
         process_item(item)
 
-        if Application.get_env(:nine_digits, :tcp_response) do
+        if @tcp_response do
           :gen_tcp.send(socket, "ok")
         end
 
