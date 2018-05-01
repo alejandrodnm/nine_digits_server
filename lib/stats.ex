@@ -8,11 +8,11 @@ defmodule Stats do
     GenServer.start_link(__MODULE__, [], opts)
   end
 
-  def init(opts) do
-    {:ok, [unique: 0, duplicates: 0], 10_000}
+  def init(_opts) do
+    {:ok, [unique: 0], 10_000}
   end
 
-  def handle_info(:timeout, unique: old_unique, duplicates: old_duplicates) do
+  def handle_info(:timeout, unique: old_unique) do
     duplicates = Repo.take_duplicates()
     unique = Repo.get_unique_count()
     new = unique - old_unique
@@ -24,6 +24,6 @@ defmodule Stats do
       } duplicates. Unique total #{unique}\n"
     )
 
-    {:noreply, [unique: unique, duplicates: duplicates], 10_000}
+    {:noreply, [unique: unique], 10_000}
   end
 end
