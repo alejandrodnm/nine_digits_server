@@ -29,7 +29,8 @@ defmodule Server do
            :binary,
            active: true,
            reuseaddr: true,
-           ip: ip
+           ip: ip,
+           packet: :line
          ]) do
       {:ok, listen_socket} ->
         Logger.debug(fn ->

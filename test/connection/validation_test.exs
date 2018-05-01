@@ -19,7 +19,7 @@ defmodule Connection.ValidationTest do
     {:error, :closed} = :gen_tcp.recv(socket, 0)
   end
 
-  test "send message to server without carriage return, server closes connection",
+  test "send message to server without carriage return, server timesout the connection",
        %{socket: socket} do
     :ok = :gen_tcp.send(socket, "123456789")
     {:error, :closed} = :gen_tcp.recv(socket, 0)
@@ -36,14 +36,6 @@ defmodule Connection.ValidationTest do
     socket: socket
   } do
     :ok = :gen_tcp.send(socket, "1234567890\n")
-    {:error, :closed} = :gen_tcp.recv(socket, 0)
-  end
-
-  test "send message to server with data after the carriage return, server closes connection",
-       %{
-         socket: socket
-       } do
-    :ok = :gen_tcp.send(socket, "123456789\r\n0123456789\n")
     {:error, :closed} = :gen_tcp.recv(socket, 0)
   end
 end
