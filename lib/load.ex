@@ -5,7 +5,7 @@ defmodule Load do
 
   def load do
     0..4
-    |> Task.async_stream(&run_worker/1, timeout: 10_000)
+    |> Task.async_stream(&run_worker/1, timeout: :infinity)
     |> Stream.run()
   end
 
@@ -15,13 +15,18 @@ defmodule Load do
 
     {:ok, socket} = :gen_tcp.connect(ip, port, [:binary, active: false])
 
-    run_worker(i * 200_000_000, socket)
+    start = i * 200_000_000
+    run_worker(start, start + 3_000_000, socket)
   end
 
-  def run_worker(i, socket) do
+  def run_worker(i, max, socket) when i < max do
     item = Integer.to_string(i)
     padded_item = String.pad_leading(item, 9, "0")
     :ok = :gen_tcp.send(socket, "#{padded_item}\r\n")
-    run_worker(i + 1, socket)
+    run_worker(i + 1, max, socket)
+  end
+
+  def run_worker(i, max, socket) do
+    :ok
   end
 end
