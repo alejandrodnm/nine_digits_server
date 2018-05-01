@@ -19,9 +19,9 @@ defmodule Stats do
 
     IO.binwrite(
       :stdio,
-      "Received #{new} unique numbers, #{duplicates} duplicates. Unique total #{
-        unique
-      }\n"
+      "#{NaiveDateTime.utc_now()} - Received #{new} unique numbers, #{
+        duplicates
+      } duplicates. Unique total #{unique}\n"
     )
 
     {:noreply, [unique: unique, duplicates: duplicates], 10_000}
