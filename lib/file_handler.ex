@@ -43,11 +43,11 @@ defmodule FileHandler do
   """
   @spec append_line(GenServer.server(), String.t()) :: :ok
   def append_line(server, item) do
-    GenServer.call(server, {:append, item <> "\n"})
+    GenServer.cast(server, {:append, item <> "\n"})
   end
 
-  def handle_call({:append, item}, _from, [file: file] = state) do
+  def handle_cast({:append, item}, [file: file] = state) do
     IO.binwrite(file, item)
-    {:reply, :ok, state}
+    {:noreply, state}
   end
 end
