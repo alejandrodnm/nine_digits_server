@@ -6,12 +6,9 @@ defmodule FileHandlerTest do
     [file_path: file_path]
   end
 
-  defp clean_state do
-    Application.stop(:nine_digits)
-    Application.start(:nine_digits)
-  end
-
   test "creates the empty file log", %{file_path: file_path} do
+    on_exit(&TestHelper.restart_application_if_not_started/0)
+
     Application.stop(:nine_digits)
     File.write(file_path, "not empty")
     Application.start(:nine_digits)
@@ -20,15 +17,16 @@ defmodule FileHandlerTest do
   end
 
   test "appends an item to file", %{file_path: file_path} do
-    clean_state()
+    TestHelper.clean_state()
     item = "item1"
     :ok = FileHandler.append_line(FileHandler, item)
+    :pong = FileHandler.ping(FileHandler)
     {:ok, read_item} = File.read(file_path)
     assert item <> "\n" == read_item
   end
 
   test "appends 3 item to file", %{file_path: file_path} do
-    clean_state()
+    TestHelper.clean_state()
 
     items =
       for n <- 1..3 do
@@ -37,6 +35,7 @@ defmodule FileHandlerTest do
         item
       end
 
+    :pong = FileHandler.ping(FileHandler)
     joined_items = Enum.join(items, "\n") <> "\n"
     {:ok, ^joined_items} = File.read(file_path)
   end

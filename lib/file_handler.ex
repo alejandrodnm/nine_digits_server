@@ -46,8 +46,16 @@ defmodule FileHandler do
     GenServer.cast(server, {:append, item <> "\n"})
   end
 
+  def ping(server) do
+    GenServer.call(server, :ping)
+  end
+
   def handle_cast({:append, item}, [file: file] = state) do
     IO.binwrite(file, item)
     {:noreply, state}
+  end
+
+  def handle_call(:ping, _from, state) do
+    {:reply, :pong, state}
   end
 end

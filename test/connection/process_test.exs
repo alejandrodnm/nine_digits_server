@@ -26,6 +26,7 @@ defmodule Connection.ProcessTest do
       end
 
     :gen_tcp.close(socket)
+    :pong = FileHandler.ping(FileHandler)
 
     joined_items = Enum.join(items, "\n") <> "\n"
     {:ok, ^joined_items} = File.read(file_path)
@@ -48,6 +49,8 @@ defmodule Connection.ProcessTest do
       :gen_tcp.close(socket)
     end)
     |> Enum.to_list()
+
+    :pong = FileHandler.ping(FileHandler)
 
     read_item = item <> "\n"
     {:ok, ^read_item} = File.read(file_path)

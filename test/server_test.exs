@@ -38,14 +38,7 @@ defmodule SeverTest do
 
     on_exit(fn ->
       :ok = :gen_tcp.close(listen_socket)
-
-      unless List.keymember?(
-               Application.started_applications(),
-               :nine_digits,
-               0
-             ) do
-        :ok = Application.start(:nine_digits)
-      end
+      TestHelper.restart_application_if_not_started()
     end)
   end
 end

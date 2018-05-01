@@ -1,0 +1,2 @@
+defmodule StatsTest do
+end
