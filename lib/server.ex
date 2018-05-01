@@ -9,17 +9,26 @@ defmodule Server do
   def start_link(opts) do
     ip = Application.get_env(:nine_digits, :ip)
     port = Application.get_env(:nine_digits, :port)
-    GenServer.start_link(__MODULE__, [ip: ip, port: port], opts)
+
+    GenServer.start_link(
+      __MODULE__,
+      [ip: ip, port: port],
+      opts ++ [timeout: 5000]
+    )
   end
 
   @doc """
-  Sets a socket on the port defined on the config
+  Sets a socket on the given port and ip. If the connection is
+  refused it waits some time and tries again, it will keep trying until
+  the process is terminated by the 5 seconds timeout set on the
+  `start_link` call.
   """
-  def init(ip: ip, port: port) do
+  def init([ip: ip, port: port] = args, retry_count \\ 1) do
     case :gen_tcp.listen(port, [
            :binary,
            active: true,
-           reuseaddr: true
+           reuseaddr: true,
+           ip: ip
          ]) do
       {:ok, listen_socket} ->
         Logger.debug(fn ->
@@ -29,13 +38,16 @@ defmodule Server do
         {:ok, %{ip: ip, port: port, listen_socket: listen_socket}}
 
       {:error, reason} = err ->
+        retry_in = 100 * retry_count
+
         Logger.error(
           "#{reason}: Couldn't open socket on ip #{ip_to_str(ip)} and port #{
             port
-          }"
+          } retrying in #{retry_in} ms"
         )
 
-        {:stop, reason}
+        :timer.sleep(retry_in)
+        init(args, retry_count + 1)
     end
   end
 
