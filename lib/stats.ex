@@ -9,20 +9,21 @@ defmodule Stats do
   end
 
   def init(opts) do
-    {:ok, [new: 0, duplicates: 0], 10_000}
+    {:ok, [unique: 0, duplicates: 0], 10_000}
   end
 
-  def handle_info(:timeout, new: old_new, duplicates: old_duplicates) do
-    [new: new, duplicates: duplicates] = Repo.take_stats()
-    unique_total = Repo.get_unique_count()
+  def handle_info(:timeout, unique: old_unique, duplicates: old_duplicates) do
+    duplicates = Repo.take_duplicates()
+    unique = Repo.get_unique_count()
+    new = unique - old_unique
 
     IO.binwrite(
       :stdio,
       "Received #{new} unique numbers, #{duplicates} duplicates. Unique total #{
-        unique_total
-      }"
+        unique
+      }\n"
     )
 
-    {:noreply, [new: new, duplicates: duplicates], 10_000}
+    {:noreply, [unique: unique, duplicates: duplicates], 10_000}
   end
 end

@@ -13,7 +13,7 @@ defmodule Repo do
     Agent.start_link(fn ->
       repo = :ets.new(:repo, [:set, :public, :named_table])
       counter = :ets.new(:counter, [:set, :public, :named_table])
-      :ets.insert(:counter, {:counter, 0, 0})
+      :ets.insert(:counter, {:duplicates, 0})
       [repo: repo, counter: counter]
     end)
   end
@@ -21,11 +21,11 @@ defmodule Repo do
   @doc """
   Returns the new and duplicates counters and resets them
   """
-  @spec take_stats :: [new: integer, duplicates: integer]
-  def take_stats do
-    [{:counter, new, duplicates}] = :ets.take(:counter, :counter)
-    :ets.insert_new(:counter, {:counter, 0, 0})
-    [new: new, duplicates: duplicates]
+  @spec take_duplicates :: integer
+  def take_duplicates do
+    [{:duplicates, duplicates}] = :ets.take(:counter, :duplicates)
+    :ets.insert_new(:counter, {:duplicates, 0})
+    duplicates
   end
 
   @doc """
@@ -47,12 +47,7 @@ defmodule Repo do
   @doc """
   Increase the given counter by 1
   """
-  @spec increase_counter(:new | :duplicates) :: integer
-  def increase_counter(:new) do
-    :ets.update_counter(:counter, :counter, {2, 1}, {:counter, 0, 0})
-  end
-
   def increase_counter(:duplicates) do
-    :ets.update_counter(:counter, :counter, {3, 1}, {:counter, 0, 0})
+    :ets.update_counter(:counter, :duplicates, 1, {:duplicates, 0})
   end
 end

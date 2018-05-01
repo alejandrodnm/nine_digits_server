@@ -116,7 +116,6 @@ defmodule Connection do
   defp process_item(item) do
     if Repo.insert_new(item) do
       FileHandler.append_line(FileHandler, item)
-      Repo.increase_counter(:new)
       :ok
     else
       Repo.increase_counter(:duplicates)

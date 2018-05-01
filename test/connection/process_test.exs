@@ -10,12 +10,11 @@ defmodule Connection.ProcessTest do
     [ip: ip, port: port, file_path: file_path]
   end
 
-  test "new items are stored in the ets table, increase the new counter and are written to disk",
-       %{
-         ip: ip,
-         port: port,
-         file_path: file_path
-       } do
+  test "new items are stored in the ets table and are written to disk", %{
+    ip: ip,
+    port: port,
+    file_path: file_path
+  } do
     {:ok, socket} = :gen_tcp.connect(ip, port, [:binary, active: false])
 
     items =
@@ -32,10 +31,9 @@ defmodule Connection.ProcessTest do
     {:ok, ^joined_items} = File.read(file_path)
     assert :ets.lookup(:repo, items)
     assert :ets.info(:repo, :size) == 3
-    assert :ets.lookup(:counter, :counter) == [{:counter, 3, 0}]
   end
 
-  test "duplicated items only increase the duplicates counter", %{
+  test "duplicated items increase the duplicates counter", %{
     ip: ip,
     port: port,
     file_path: file_path
@@ -55,6 +53,6 @@ defmodule Connection.ProcessTest do
     {:ok, ^read_item} = File.read(file_path)
     assert :ets.lookup(:repo, item) == [{item, true}]
     assert :ets.info(:repo, :size) == 1
-    assert :ets.lookup(:counter, :counter) == [{:counter, 1, 2}]
+    assert :ets.lookup(:counter, :duplicates) == [{:duplicates, 2}]
   end
 end
