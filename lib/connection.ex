@@ -36,6 +36,7 @@ defmodule Connection do
       "#{inspect(self())}: waiting connection"
     end)
 
+    # FIXME with a timeout
     socket = accept_connection(listen_socket)
     {:noreply, [socket: socket], @idle_timeout}
   end
@@ -48,6 +49,8 @@ defmodule Connection do
   @idle_timeout ms the connection will be close.
   """
   def handle_info({:tcp, _socket, packet}, [socket: socket] = state) do
+    :inet.setopts(socket, active: :once)
+
     Logger.debug(fn ->
       "#{inspect(self())}: received #{packet}"
     end)
@@ -100,10 +103,16 @@ defmodule Connection do
     {:stop, reason, state}
   end
 
+  def handle_info(msg, state) do
+    Logger.error(msg)
+    {:noreply, state}
+  end
+
   @spec accept_connection(port()) :: port()
   defp accept_connection(listen_socket) do
     # If it fails the supervisor will restart it
     {:ok, socket} = :gen_tcp.accept(listen_socket)
+    :inet.setopts(socket, active: :once)
 
     Logger.debug(fn ->
       "#{inspect(self())}: connection stablished"

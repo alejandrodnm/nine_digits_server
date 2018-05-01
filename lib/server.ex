@@ -27,7 +27,7 @@ defmodule Server do
   def init([ip: ip, port: port] = args, retry_count \\ 1) do
     case :gen_tcp.listen(port, [
            :binary,
-           active: true,
+           active: false,
            reuseaddr: true,
            ip: ip,
            packet: :line
