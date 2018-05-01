@@ -36,9 +36,8 @@ defmodule Connection.ProcessTest do
     joined_items = Enum.join(items, "\n") <> "\n"
     {:ok, ^joined_items} = File.read(file_path)
     assert :ets.lookup(:repo, items)
-    assert :ets.lookup(:counter, :new) == [new: 3]
-    assert :ets.lookup(:counter, :duplicates) == [duplicates: 0]
     assert :ets.info(:repo, :size) == 3
+    assert :ets.lookup(:counter, :counter) == [{:counter, 3, 0}]
   end
 
   test "duplicated items only increase the duplicates counter", %{
@@ -46,7 +45,6 @@ defmodule Connection.ProcessTest do
     port: port,
     file_path: file_path
   } do
-    {:ok, socket} = :gen_tcp.connect(ip, port, [:binary, active: false])
     item = "123456789"
 
     1..3
@@ -62,7 +60,6 @@ defmodule Connection.ProcessTest do
     {:ok, ^read_item} = File.read(file_path)
     assert :ets.lookup(:repo, item) == [{item, true}]
     assert :ets.info(:repo, :size) == 1
-    assert :ets.lookup(:counter, :new) == [new: 1]
-    assert :ets.lookup(:counter, :duplicates) == [duplicates: 2]
+    assert :ets.lookup(:counter, :counter) == [{:counter, 1, 2}]
   end
 end

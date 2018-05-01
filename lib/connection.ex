@@ -113,12 +113,12 @@ defmodule Connection do
 
   @spec process_item(String.t()) :: :ok
   defp process_item(item) do
-    if :ets.insert_new(:repo, {item, true}) do
-      :ets.update_counter(:counter, :new, 1, {:new, 0})
+    if Repo.insert_new(item) do
       FileHandler.append_line(FileHandler, item)
+      Repo.increase_counter(:new)
       :ok
     else
-      :ets.update_counter(:counter, :duplicates, 1, {:duplicates, 0})
+      Repo.increase_counter(:duplicates)
       :ok
     end
   end

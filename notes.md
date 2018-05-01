@@ -1,6 +1,5 @@
 # ToDo
 
+- write about no backlog limit
 - termination
-- write to file
-- write only different numbers
-- 10 second report
+- restart on crashes

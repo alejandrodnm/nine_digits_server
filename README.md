@@ -7,6 +7,7 @@ TCP server for reciving nine digits numbers
 Clients will not sit idle, so connections will be close based on the TCP
 implementation of the host machine.
 
+### Resilience
 Uses dets instead of ets in order to restore the state of the run if the application
 crashes.
 
