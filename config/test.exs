@@ -7,4 +7,5 @@ config :nine_digits,
   file_path: "numbers.log",
   # if tcp_response is true the connections will send a response to the
   # clients after procesing an item
-  tcp_response: true
+  tcp_response: true,
+  server_timeout: 200

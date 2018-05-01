@@ -5,6 +5,7 @@ defmodule Server do
   TCP server for receiving nine digits messages.
   """
   use GenServer
+  @timeout Application.get_env(:nine_digits, :server_timeout, 5000)
 
   def start_link(opts) do
     ip = Application.get_env(:nine_digits, :ip)
@@ -13,14 +14,14 @@ defmodule Server do
     GenServer.start_link(
       __MODULE__,
       [ip: ip, port: port],
-      opts ++ [timeout: 5000]
+      opts ++ [timeout: @timeout]
     )
   end
 
   @doc """
   Sets a socket on the given port and ip. If the connection is
   refused it waits some time and tries again, it will keep trying until
-  the process is terminated by the 5 seconds timeout set on the
+  the process is terminated by the `@timeout` timeout set on the
   `start_link` call.
   """
   def init([ip: ip, port: port] = args, retry_count \\ 1) do
@@ -37,7 +38,7 @@ defmodule Server do
 
         {:ok, %{ip: ip, port: port, listen_socket: listen_socket}}
 
-      {:error, reason} = err ->
+      {:error, reason} ->
         retry_in = 100 * retry_count
 
         Logger.error(
