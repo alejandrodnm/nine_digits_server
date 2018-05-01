@@ -55,8 +55,11 @@ defmodule Connection do
       "#{inspect(self())}: received #{packet}"
     end)
 
-    case Regex.named_captures(~r/^(?<item>[0-9]{9})(\r\n|\r|\n)$/, packet) do
-      %{"item" => item} ->
+    case Regex.named_captures(
+           ~r/^((?<item>[0-9]{9})|(?<terminate>terminate))(\r\n|\r|\n)$/,
+           packet
+         ) do
+      %{"item" => item, "terminate" => ""} ->
         Logger.debug(fn ->
           "#{inspect(self())}: valid packet #{item}"
         end)
@@ -68,6 +71,14 @@ defmodule Connection do
         end
 
         {:noreply, state, @idle_timeout}
+
+      %{"terminate" => "terminate", "item" => ""} ->
+        Logger.debug(fn ->
+          "#{inspect(self())}: terminate encountered"
+        end)
+
+        Application.get_env(:nine_digits, :terminate, &:init.stop/0).()
+        {:stop, :terminate, state}
 
       nil ->
         Logger.debug(fn ->

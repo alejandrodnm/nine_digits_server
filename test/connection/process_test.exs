@@ -58,4 +58,20 @@ defmodule Connection.ProcessTest do
     assert :ets.info(:repo, :size) == 1
     assert :ets.lookup(:counter, :duplicates) == [{:duplicates, 2}]
   end
+
+  test "sending a terminate stops the application", %{
+    ip: ip,
+    port: port,
+    file_path: file_path
+  } do
+    self_pid = self()
+
+    Application.put_env(:nine_digits, :terminate, fn ->
+      send(self_pid, :terminate)
+    end)
+
+    {:ok, socket} = :gen_tcp.connect(ip, port, [:binary, active: false])
+    :ok = :gen_tcp.send(socket, "terminate\r\n")
+    assert_receive :terminate
+  end
 end
