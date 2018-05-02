@@ -5,9 +5,18 @@ defmodule NineDigits do
   Parses packets, validates and saves input. Returns the corresponding
   messages to the connections.
   """
+  # import ExProf.Macro
 
   def process_packet(packet) do
-    process_packet(Regex.split(~r/(\r\n|\n)/, packet), :ok)
+    splited = Regex.split(~r/(\r\n|\n)/, packet)
+    process_packet(splited, :ok)
+    # {b, c} =
+    #   profile do
+    #     splited = Regex.split(~r/(\r\n|\n)/, packet)
+    #     process_packet(splited, :ok)
+    #   end
+
+    # IO.inspect(c)
   end
 
   def process_packet(_, :terminate) do
@@ -16,14 +25,6 @@ defmodule NineDigits do
 
   def process_packet(_, :error) do
     :error
-  end
-
-  def process_packet([], :ok) do
-    :ok
-  end
-
-  def process_packet([], {:ok, partial_item}) do
-    {:ok, partial_item}
   end
 
   def process_packet([""], :ok) do
@@ -36,27 +37,17 @@ defmodule NineDigits do
 
   def process_packet([item | items], :ok) do
     status =
-      case Regex.named_captures(
-             ~r/^((?<item>[0-9]{9})|(?<terminate>terminate))$/,
-             item
-           ) do
-        %{"item" => item, "terminate" => ""} ->
-          Logger.debug(fn ->
-            "#{inspect(self())}: valid packet #{item}"
-          end)
-
+      if String.length(item) == 9 do
+        try do
+          String.to_integer(item)
           process_valid_item(item)
           :ok
-
-        %{"terminate" => "terminate", "item" => ""} ->
-          :terminate
-
-        nil ->
-          Logger.debug(fn ->
-            "#{inspect(self())}: invalid item #{item} closing connection"
-          end)
-
-          :error
+        rescue
+          ArgumentError ->
+            if item == "terminate", do: :terminate, else: :error
+        end
+      else
+        :error
       end
 
     process_packet(items, status)
