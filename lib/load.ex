@@ -16,7 +16,7 @@ defmodule Load do
     {:ok, socket} = :gen_tcp.connect(ip, port, [:binary, active: false])
 
     start = i * 200_000_000
-    run_worker(start, start + 3_000_000, socket)
+    run_worker(start, start + 3_000_000_000, socket)
   end
 
   def run_worker(i, max, socket) when i < max do
