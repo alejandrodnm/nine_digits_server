@@ -11,13 +11,16 @@ defmodule Repo do
 
   def start_link(_opts) do
     Agent.start_link(fn ->
-      repo =
-        :ets.new(:repo, [
-          :set,
-          :public,
-          :named_table,
-          {:write_concurrency, true}
-        ])
+      shards =
+        0..9
+        |> Enum.map(fn i ->
+          :ets.new(String.to_atom("shard_#{i}"), [
+            :set,
+            :public,
+            :named_table,
+            {:write_concurrency, true}
+          ])
+        end)
 
       counter =
         :ets.new(:counter, [
@@ -28,7 +31,7 @@ defmodule Repo do
         ])
 
       :ets.insert(:counter, {:duplicates, 0})
-      [repo: repo, counter: counter]
+      [shards: shards, counter: counter]
     end)
   end
 
@@ -47,7 +50,10 @@ defmodule Repo do
   """
   @spec get_unique_count :: integer
   def get_unique_count do
-    :ets.info(:repo, :size)
+    0..9
+    |> Enum.reduce(0, fn i, acc ->
+      :ets.info(String.to_existing_atom("shard_#{i}"), :size) + acc
+    end)
   end
 
   @doc """
@@ -55,7 +61,8 @@ defmodule Repo do
   """
   @spec insert_new(String.t()) :: boolean
   def insert_new(item) do
-    :ets.insert_new(:repo, {item, true})
+    i = String.first(item)
+    :ets.insert_new(String.to_existing_atom("shard_" <> i), {item, true})
   end
 
   @doc """

@@ -3,13 +3,14 @@ defmodule Stats do
   Handles the stats and reporting of the application
   """
   use GenServer
+  @timeout 10_000
 
   def start_link(opts) do
     GenServer.start_link(__MODULE__, [], opts)
   end
 
   def init(_opts) do
-    {:ok, [unique: 0], 10_000}
+    {:ok, [unique: 0], @timeout}
   end
 
   def handle_info(:timeout, unique: old_unique) do
@@ -24,6 +25,6 @@ defmodule Stats do
       } duplicates. Unique total #{unique}\n"
     )
 
-    {:noreply, [unique: unique], 10_000}
+    {:noreply, [unique: unique], @timeout}
   end
 end
