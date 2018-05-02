@@ -4,3 +4,4 @@
 - restart on crashes
 - connection FIXME
 - one writter per connection?
+- Using async_stream for processing is slower
