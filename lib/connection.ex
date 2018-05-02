@@ -38,7 +38,7 @@ defmodule Connection do
 
     # FIXME with a timeout
     socket = accept_connection(listen_socket)
-    {:noreply, [socket: socket], @idle_timeout}
+    {:noreply, [socket: socket, partial_item: ""], @idle_timeout}
   end
 
   @doc """
@@ -48,43 +48,37 @@ defmodule Connection do
   After receiving a valid packet if the doesn't send a message after
   @idle_timeout ms the connection will be close.
   """
-  def handle_info({:tcp, _socket, packet}, [socket: socket] = state) do
+  def handle_info(
+        {:tcp, _socket, packet},
+        [socket: socket, partial_item: partial_item] = state
+      ) do
     :inet.setopts(socket, active: :once)
 
     Logger.debug(fn ->
       "#{inspect(self())}: received #{packet}"
     end)
 
-    case Regex.named_captures(
-           ~r/^((?<item>[0-9]{9})|(?<terminate>terminate))(\r\n|\r|\n)$/,
-           packet
-         ) do
-      %{"item" => item, "terminate" => ""} ->
-        Logger.debug(fn ->
-          "#{inspect(self())}: valid packet #{item}"
-        end)
-
-        process_item(item)
-
+    case NineDigits.process_packet(partial_item <> packet) do
+      :ok ->
         if @tcp_response do
           :gen_tcp.send(socket, "ok")
         end
 
-        {:noreply, state, @idle_timeout}
+        {:noreply, [socket: socket, partial_item: ""], @idle_timeout}
 
-      %{"terminate" => "terminate", "item" => ""} ->
-        Logger.debug(fn ->
-          "#{inspect(self())}: terminate encountered"
-        end)
+      {:ok, new_partial_item} ->
+        if @tcp_response do
+          :gen_tcp.send(socket, "ok")
+        end
 
+        {:noreply, [socket: socket, partial_item: new_partial_item],
+         @idle_timeout}
+
+      :terminate ->
         Application.get_env(:nine_digits, :terminate, &:init.stop/0).()
         {:stop, :terminate, state}
 
-      nil ->
-        Logger.debug(fn ->
-          "#{inspect(self())}: invalid packet #{packet} closing connection"
-        end)
-
+      :error ->
         :ok = :gen_tcp.close(socket)
         {:stop, :invalid_packet, state}
     end
@@ -130,16 +124,5 @@ defmodule Connection do
     end)
 
     socket
-  end
-
-  @spec process_item(String.t()) :: :ok
-  defp process_item(item) do
-    if Repo.insert_new(item) do
-      FileHandler.append_line(FileHandler, item)
-      :ok
-    else
-      Repo.increase_counter(:duplicates)
-      :ok
-    end
   end
 end

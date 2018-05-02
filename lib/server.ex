@@ -30,7 +30,7 @@ defmodule Server do
            active: false,
            reuseaddr: true,
            ip: ip,
-           packet: :line
+           packet: 0
          ]) do
       {:ok, listen_socket} ->
         Logger.debug(fn ->
