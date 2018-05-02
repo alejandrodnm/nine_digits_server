@@ -4,7 +4,7 @@ defmodule Load do
   """
 
   def load do
-    0..4
+    [0]
     |> Task.async_stream(&run_worker/1, timeout: :infinity)
     |> Stream.run()
   end

@@ -39,8 +39,7 @@ defmodule NineDigits do
     status =
       if String.length(item) == 9 do
         try do
-          String.to_integer(item)
-          process_valid_item(item)
+          process_valid_item(String.to_integer(item))
           :ok
         rescue
           ArgumentError ->
