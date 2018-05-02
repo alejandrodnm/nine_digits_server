@@ -5,18 +5,10 @@ defmodule NineDigits do
   Parses packets, validates and saves input. Returns the corresponding
   messages to the connections.
   """
-  # import ExProf.Macro
 
   def process_packet(packet) do
     splited = Regex.split(~r/(\r\n|\n)/, packet)
     process_packet(splited, :ok)
-    # {b, c} =
-    #   profile do
-    #     splited = Regex.split(~r/(\r\n|\n)/, packet)
-    #     process_packet(splited, :ok)
-    #   end
-
-    # IO.inspect(c)
   end
 
   def process_packet(_, :terminate) do
