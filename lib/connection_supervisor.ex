@@ -21,6 +21,6 @@ defmodule Connection.Supervisor do
         Supervisor.child_spec(Connection, id: {Connection, n})
       end
 
-    Supervisor.init(children, strategy: :one_for_one)
+    Supervisor.init(children, strategy: :one_for_one, max_restarts: 6)
   end
 end

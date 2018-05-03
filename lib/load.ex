@@ -4,14 +4,9 @@ defmodule Load do
   """
 
   def load do
-    start = DateTime.utc_now()
-
-    [0]
+    0..4
     |> Task.async_stream(&run_worker/1, timeout: :infinity, max_concurrency: 5)
     |> Stream.run()
-
-    finish = DateTime.utc_now()
-    IO.inspect(DateTime.diff(finish, start, :millisecond))
   end
 
   defp run_worker(i) do
@@ -20,18 +15,21 @@ defmodule Load do
 
     {:ok, socket} = :gen_tcp.connect(ip, port, [:binary, active: false])
 
+    start_time = DateTime.utc_now()
     start = i * 200_000_000
-    run_worker(start, start + 2_000_000, socket)
+    run_worker(start, start + 2_000_000, socket, start_time)
   end
 
-  def run_worker(i, max, socket) when i < max do
+  def run_worker(i, max, socket, start) when i < max do
     item = Integer.to_string(i)
     padded_item = String.pad_leading(item, 9, "0")
     :ok = :gen_tcp.send(socket, "#{padded_item}\r\n")
-    run_worker(i + 1, max, socket)
+    run_worker(i + 1, max, socket, start)
   end
 
-  def run_worker(i, max, socket) do
+  def run_worker(i, max, socket, start) do
+    finish = DateTime.utc_now()
+    IO.inspect(DateTime.diff(finish, start, :millisecond))
     :ok
   end
 end

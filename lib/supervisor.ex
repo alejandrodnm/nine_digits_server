@@ -10,10 +10,10 @@ defmodule NineDigits.Supervisor do
 
   def init(:ok) do
     children = [
-      # {Repo, name: Repo},
-      # {FileHandler, name: FileHandler},
-      # Writter.Supervisor,
-      # {Stats, name: Stats},
+      {Repo, name: Repo},
+      {FileHandler, name: FileHandler},
+      Writter.Supervisor,
+      {Stats, name: Stats},
       {Server, name: Server},
       Connection.Supervisor
     ]

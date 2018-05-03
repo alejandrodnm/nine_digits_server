@@ -33,6 +33,7 @@ defmodule NineDigits do
         cond do
           {item_integer, ""} = Integer.parse(item) ->
             process_valid_item(item, item_integer, writter)
+            :ok
 
           "terminate" == item ->
             :terminate
@@ -50,7 +51,8 @@ defmodule NineDigits do
   # @spec process_valid_item(String.t(), pid) :: :ok
   defp process_valid_item(item, item_integer, writter) do
     if Repo.insert_new(item_integer) do
-      Writter.append_line(writter, item)
+      :ok
+      # Writter.append_line(writter, item)
     else
       Repo.increase_counter(:duplicates)
     end
