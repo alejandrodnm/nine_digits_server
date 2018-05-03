@@ -4,9 +4,14 @@ defmodule Load do
   """
 
   def load do
+    start = DateTime.utc_now()
+
     [0]
-    |> Task.async_stream(&run_worker/1, timeout: :infinity)
+    |> Task.async_stream(&run_worker/1, timeout: :infinity, max_concurrency: 5)
     |> Stream.run()
+
+    finish = DateTime.utc_now()
+    IO.inspect(DateTime.diff(finish, start, :millisecond))
   end
 
   defp run_worker(i) do
@@ -16,7 +21,7 @@ defmodule Load do
     {:ok, socket} = :gen_tcp.connect(ip, port, [:binary, active: false])
 
     start = i * 200_000_000
-    run_worker(start, start + 3_000_000_000, socket)
+    run_worker(start, start + 2_000_000, socket)
   end
 
   def run_worker(i, max, socket) when i < max do

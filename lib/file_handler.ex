@@ -16,13 +16,7 @@ defmodule FileHandler do
   def init(file_path: file_path) do
     case remove_file(file_path) do
       :ok ->
-        case File.open(file_path, [:append]) do
-          {:ok, file} ->
-            {:ok, [file: file]}
-
-          {:error, reason} ->
-            {:stop, "#{reason} error when opening `#{file_path}`"}
-        end
+        {:ok, [file: file_path, free: [], registered: %{}]}
 
       {:error, reason} ->
         {:stop, "#{reason} error when deleting `#{file_path}`"}
@@ -38,24 +32,64 @@ defmodule FileHandler do
     end
   end
 
-  @doc """
-  Appends the given item to the end of the file.
-  """
-  @spec append_line(GenServer.server(), String.t()) :: :ok
-  def append_line(server, item) do
-    GenServer.cast(server, {:append, item <> "\n"})
+  # Change name to register_worker
+  def register do
+    GenServer.call(__MODULE__, :register)
   end
 
-  def ping(server) do
-    GenServer.call(server, :ping)
+  # Change name to register
+  def assign_writter do
+    GenServer.call(__MODULE__, :assign)
   end
 
-  def handle_cast({:append, item}, [file: file] = state) do
-    IO.binwrite(file, item)
-    {:noreply, state}
+  def unregister do
+    GenServer.call(__MODULE__, :unregister)
   end
 
-  def handle_call(:ping, _from, state) do
-    {:reply, :pong, state}
+  def handle_call(
+        :register,
+        {pid, tag},
+        file: file,
+        free: free,
+        registered: registered
+      ) do
+    new_state = [file: file, free: [pid | free], registered: registered]
+    {:reply, {:ok, file}, new_state}
+  end
+
+  def handle_call(
+        :assign,
+        {pid, tag},
+        file: file,
+        free: [writter | free],
+        registered: registered
+      ) do
+    new_state = [
+      file: file,
+      free: free,
+      registered: Map.put(registered, pid, writter)
+    ]
+
+    {:reply, {:ok, writter}, new_state}
+  end
+
+  def handle_call(
+        :assign,
+        {pid, tag},
+        state
+      ) do
+    {:reply, {:ok, :ok}, state}
+  end
+
+  def handle_call(
+        :unregister,
+        {pid, tag},
+        file: file,
+        free: free,
+        registered: registered
+      ) do
+    {writter, new_registered} = Map.pop(registered, pid)
+    new_state = [file: file, free: [writter | free], registered: new_registered]
+    {:reply, :ok, new_state}
   end
 end

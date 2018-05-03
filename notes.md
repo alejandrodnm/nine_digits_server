@@ -9,3 +9,9 @@
 - gen_tcp.recv was slower
 - try regex and it was slower than checking length and convert to string
 - gonna try sharding and removing trailing zeros. It made no difference
+
+# Perf
+
+- Receive packets 1 connection nothing more:
+
+    1. Active once: 6520, 6549, 6586

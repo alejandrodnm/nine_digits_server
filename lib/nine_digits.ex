@@ -6,53 +6,55 @@ defmodule NineDigits do
   messages to the connections.
   """
 
-  def process_packet(packet) do
+  def process_packet(packet, writter) do
     splited = Regex.split(~r/(\r\n|\n)/, packet)
-    process_packet(splited, :ok)
+    process_packet(splited, :ok, writter)
   end
 
-  def process_packet(_, :terminate) do
+  def process_packet(_, :terminate, _) do
     :terminate
   end
 
-  def process_packet(_, :error) do
+  def process_packet(_, :error, _) do
     :error
   end
 
-  def process_packet([""], :ok) do
+  def process_packet([""], :ok, _) do
     :ok
   end
 
-  def process_packet([item], :ok) do
+  def process_packet([item], :ok, _) do
     {:ok, item}
   end
 
-  def process_packet([item | items], :ok) do
+  def process_packet([item | items], :ok, writter) do
     status =
       if String.length(item) == 9 do
-        try do
-          process_valid_item(String.to_integer(item))
-          :ok
-        rescue
-          ArgumentError ->
-            if item == "terminate", do: :terminate, else: :error
+        cond do
+          {item_integer, ""} = Integer.parse(item) ->
+            process_valid_item(item, item_integer, writter)
+
+          "terminate" == item ->
+            :terminate
+
+          true ->
+            :error
         end
       else
         :error
       end
 
-    process_packet(items, status)
+    process_packet(items, status, writter)
   end
 
-  @spec process_valid_item(String.t()) :: :ok
-  defp process_valid_item(item) do
-    if Repo.insert_new(item) do
-      # FIXME
-      # FileHandler.append_line(FileHandler, item)
-      :ok
+  # @spec process_valid_item(String.t(), pid) :: :ok
+  defp process_valid_item(item, item_integer, writter) do
+    if Repo.insert_new(item_integer) do
+      Writter.append_line(writter, item)
     else
       Repo.increase_counter(:duplicates)
-      :ok
     end
+
+    :ok
   end
 end

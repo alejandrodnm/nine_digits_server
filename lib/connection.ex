@@ -38,8 +38,16 @@ defmodule Connection do
 
     # FIXME with a timeout
     socket = accept_connection(listen_socket)
-    {:noreply, [socket: socket, partial_item: ""], @idle_timeout}
+    # {:ok, writter} = FileHandler.assign_writter()
+
+    {:noreply, [socket: socket, partial_item: "", writter: :ok, counter: 0],
+     @idle_timeout}
   end
+
+  # def terminate(reason, state) do
+  #   FileHandler.unregister()
+  #   reason
+  # end
 
   @doc """
   Handles messages from the clients, packets received must be 9 digits
@@ -50,38 +58,71 @@ defmodule Connection do
   """
   def handle_info(
         {:tcp, _socket, packet},
-        [socket: socket, partial_item: partial_item] = state
+        [
+          socket: socket,
+          partial_item: partial_item,
+          writter: writter,
+          counter: counter
+        ] = state
+      )
+      when counter > 500_000 do
+    IO.inspect("#{inspect(self())} #{NaiveDateTime.utc_now()} #{counter}")
+    :inet.setopts(socket, active: :once)
+
+    {:noreply,
+     [
+       socket: socket,
+       partial_item: partial_item,
+       writter: writter,
+       counter: 0
+     ], @idle_timeout}
+  end
+
+  def handle_info(
+        {:tcp, _socket, packet},
+        [
+          socket: socket,
+          partial_item: partial_item,
+          writter: writter,
+          counter: counter
+        ] = state
       ) do
     :inet.setopts(socket, active: :once)
 
-    Logger.debug(fn ->
-      "#{inspect(self())}: received #{packet}"
-    end)
+    {:noreply,
+     [
+       socket: socket,
+       partial_item: partial_item,
+       writter: writter,
+       counter: counter + 1
+     ], @idle_timeout}
 
-    case NineDigits.process_packet(partial_item <> packet) do
-      :ok ->
-        if @tcp_response do
-          :gen_tcp.send(socket, "ok")
-        end
+    # case NineDigits.process_packet(partial_item <> packet, writter) do
+    #   :ok ->
+    #     if @tcp_response do
+    #       :gen_tcp.send(socket, "ok")
+    #     end
 
-        {:noreply, [socket: socket, partial_item: ""], @idle_timeout}
+    #     {:noreply, [socket: socket, partial_item: "", writter: writter],
+    #      @idle_timeout}
 
-      {:ok, new_partial_item} ->
-        if @tcp_response do
-          :gen_tcp.send(socket, "ok")
-        end
+    #   {:ok, new_partial_item} ->
+    #     if @tcp_response do
+    #       :gen_tcp.send(socket, "ok")
+    #     end
 
-        {:noreply, [socket: socket, partial_item: new_partial_item],
-         @idle_timeout}
+    #     {:noreply,
+    #      [socket: socket, partial_item: new_partial_item, writter: writter],
+    #      @idle_timeout}
 
-      :terminate ->
-        Application.get_env(:nine_digits, :terminate, &:init.stop/0).()
-        {:stop, :terminate, state}
+    #   :terminate ->
+    #     Application.get_env(:nine_digits, :terminate, &:init.stop/0).()
+    #     {:stop, :terminate, state}
 
-      :error ->
-        :ok = :gen_tcp.close(socket)
-        {:stop, :invalid_packet, state}
-    end
+    #   :error ->
+    #     :ok = :gen_tcp.close(socket)
+    #     {:stop, :invalid_packet, state}
+    # end
   end
 
   def handle_info(:timeout, state) do
@@ -106,11 +147,6 @@ defmodule Connection do
     end)
 
     {:stop, reason, state}
-  end
-
-  def handle_info(msg, state) do
-    Logger.error(msg)
-    {:noreply, state}
   end
 
   @spec accept_connection(port()) :: port()
