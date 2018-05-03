@@ -17,7 +17,7 @@ defmodule Load do
 
     start_time = DateTime.utc_now()
     start = i * 200_000_000
-    run_worker(start, start + 2_000_000, socket, start_time)
+    run_worker(start, start + 20_000_000, socket, start_time)
   end
 
   def run_worker(i, max, socket, start) when i < max do

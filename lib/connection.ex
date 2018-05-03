@@ -41,14 +41,15 @@ defmodule Connection do
     # the writter
     socket = accept_connection(listen_socket)
     start = DateTime.utc_now()
-    # {:ok, writter} = FileHandler.assign_writter()
+    {:ok, writter} = FileHandler.assign_writter()
 
-    {:noreply, [socket: socket, partial_item: "", writter: :ok, start: start],
+    {:noreply,
+     [socket: socket, partial_item: "", writter: writter, start: start],
      @idle_timeout}
   end
 
   def terminate(reason, state) do
-    # FileHandler.unregister()
+    FileHandler.unregister()
     :ok
   end
 

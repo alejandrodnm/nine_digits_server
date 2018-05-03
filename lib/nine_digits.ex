@@ -8,55 +8,62 @@ defmodule NineDigits do
 
   def process_packet(packet, writter) do
     splited = Regex.split(~r/(\r\n|\n)/, packet)
-    process_packet(splited, :ok, writter)
+    process_packet(splited, :ok, writter, [])
   end
 
-  def process_packet(_, :terminate, _) do
+  def process_packet(_, :terminate, writter, buffer) do
+    Writter.append_line(writter, Enum.join(buffer, "\n"))
     :terminate
   end
 
-  def process_packet(_, :error, _) do
+  def process_packet(_, :error, writter, buffer) do
+    Writter.append_line(writter, Enum.join(buffer, "\n"))
     :error
   end
 
-  def process_packet([""], :ok, _) do
+  def process_packet([""], :ok, writter, buffer) do
+    Writter.append_line(writter, Enum.join(buffer, "\n"))
     :ok
   end
 
-  def process_packet([item], :ok, _) do
+  def process_packet([item], :ok, writter, buffer) do
+    Writter.append_line(writter, Enum.join(buffer, "\n"))
     {:ok, item}
   end
 
-  def process_packet([item | items], :ok, writter) do
-    status =
+  def process_packet([item | items], :ok, writter, buffer) do
+    {status, new_buffer} =
       if String.length(item) == 9 do
         cond do
           {item_integer, ""} = Integer.parse(item) ->
-            process_valid_item(item, item_integer, writter)
-            :ok
+            case process_valid_item(item_integer) do
+              :new ->
+                {:ok, [item_integer | buffer]}
+
+              :duplicate ->
+                {:ok, buffer}
+            end
 
           "terminate" == item ->
-            :terminate
+            {:terminate, buffer}
 
           true ->
-            :error
+            {:error, buffer}
         end
       else
-        :error
+        {:error, buffer}
       end
 
-    process_packet(items, status, writter)
+    process_packet(items, status, writter, new_buffer)
   end
 
   # @spec process_valid_item(String.t(), pid) :: :ok
-  defp process_valid_item(item, item_integer, writter) do
-    if Repo.insert_new(item_integer) do
-      :ok
-      # Writter.append_line(writter, item)
+  defp process_valid_item(item) do
+    if Repo.insert_new(item) do
+      :new
     else
       Repo.increase_counter(:duplicates)
+      :duplicates
     end
-
-    :ok
   end
 end
