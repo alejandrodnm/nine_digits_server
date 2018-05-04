@@ -1,3 +1,5 @@
+require Logger
+
 defmodule Load do
   @moduledoc """
   Executes load tests
@@ -27,9 +29,9 @@ defmodule Load do
     run_worker(i + 1, max, socket, start)
   end
 
-  def run_worker(i, max, socket, start) do
+  def run_worker(_, _, _, start) do
     finish = DateTime.utc_now()
-    IO.inspect(DateTime.diff(finish, start, :millisecond))
+    Logger.info("#{DateTime.diff(finish, start, :millisecond)}")
     :ok
   end
 end

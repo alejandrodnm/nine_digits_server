@@ -48,7 +48,7 @@ defmodule FileHandler do
 
   def handle_call(
         :register,
-        {pid, tag},
+        {pid, _tag},
         file: file,
         free: free,
         registered: registered
@@ -59,7 +59,7 @@ defmodule FileHandler do
 
   def handle_call(
         :assign,
-        {pid, tag},
+        {pid, _tag},
         file: file,
         free: [writter | free],
         registered: registered
@@ -74,16 +74,8 @@ defmodule FileHandler do
   end
 
   def handle_call(
-        :assign,
-        {pid, tag},
-        state
-      ) do
-    {:reply, {:ok, :ok}, state}
-  end
-
-  def handle_call(
         :unregister,
-        {pid, tag},
+        {pid, _tag},
         file: file,
         free: free,
         registered: registered

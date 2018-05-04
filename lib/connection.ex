@@ -22,6 +22,11 @@ defmodule Connection do
     {:ok, []}
   end
 
+  def terminate(_, _) do
+    FileHandler.unregister()
+    :ok
+  end
+
   @doc """
   Called immediately after process initialization. Gets the listening
   socket from Server and waits for new client connections.
@@ -48,11 +53,6 @@ defmodule Connection do
      @idle_timeout}
   end
 
-  def terminate(reason, state) do
-    FileHandler.unregister()
-    :ok
-  end
-
   @doc """
   Handles messages from the clients, packets received must be 9 digits
   followed by a carriage return, otherwise the connection will be close.
@@ -65,8 +65,7 @@ defmodule Connection do
         [
           socket: socket,
           partial_item: partial_item,
-          writter: writter,
-          start: start
+          writter: writter
         ] = state
       ) do
     :inet.setopts(socket, active: :once)
@@ -77,8 +76,7 @@ defmodule Connection do
           :gen_tcp.send(socket, "ok")
         end
 
-        {:noreply,
-         [socket: socket, partial_item: "", writter: writter, start: start],
+        {:noreply, [socket: socket, partial_item: "", writter: writter],
          @idle_timeout}
 
       {:ok, new_partial_item} ->
@@ -90,8 +88,7 @@ defmodule Connection do
          [
            socket: socket,
            partial_item: new_partial_item,
-           writter: writter,
-           start: start
+           writter: writter
          ], @idle_timeout}
 
       :terminate ->
@@ -112,20 +109,11 @@ defmodule Connection do
     {:stop, :tcp_closed, state}
   end
 
-  def handle_info(
-        {:tcp_closed, _},
-        [
-          socket: socket,
-          partial_item: partial_item,
-          writter: writter,
-          start: start
-        ] = state
-      ) do
+  def handle_info({:tcp_closed, _}, state) do
     Logger.debug(fn ->
       "#{inspect(self())}: connection closed"
     end)
 
-    finish = DateTime.utc_now()
     {:stop, :tcp_closed, state}
   end
 

@@ -61,8 +61,7 @@ defmodule Connection.ProcessTest do
 
   test "sending a terminate stops the application", %{
     ip: ip,
-    port: port,
-    file_path: file_path
+    port: port
   } do
     self_pid = self()
 
