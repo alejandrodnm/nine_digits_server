@@ -9,6 +9,8 @@
 - gen_tcp.recv was slower
 - try regex and it was slower than checking length and convert to string
 - gonna try sharding and removing trailing zeros. It made no difference
+- Write from multiple processes
+- Rely on Nagle's algorithm for buffering writes after processing
 
 # Perf
 

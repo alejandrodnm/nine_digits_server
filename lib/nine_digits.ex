@@ -26,9 +26,18 @@ defmodule NineDigits do
     :ok
   end
 
+  @doc """
+  If the partial item has a length bigger than 9 then it's an
+  invalid packet and we don't have to parse the rest.
+  """
   def process_packet([item], :ok, writter, buffer) do
     Writter.append_line(writter, Enum.join(buffer, "\n"))
-    {:ok, item}
+
+    if String.length(item) > 9 do
+      :error
+    else
+      {:ok, item}
+    end
   end
 
   def process_packet([item | items], :ok, writter, buffer) do
@@ -40,7 +49,7 @@ defmodule NineDigits do
               :new ->
                 {:ok, [item_integer | buffer]}
 
-              :duplicate ->
+              :duplicates ->
                 {:ok, buffer}
             end
 

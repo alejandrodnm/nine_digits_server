@@ -126,7 +126,6 @@ defmodule Connection do
     end)
 
     finish = DateTime.utc_now()
-    Logger.warn("FINISHED in #{DateTime.diff(finish, start, :millisecond)}")
     {:stop, :tcp_closed, state}
   end
 
