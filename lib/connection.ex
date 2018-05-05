@@ -18,6 +18,7 @@ defmodule Connection do
   """
   use GenServer
 
+  @tcp_response Application.get_env(:nine_digits, :tcp_response, false)
   @idle_timeout Application.get_env(:nine_digits, :idle_timeout, 5000)
   @typep state :: [
            listen_socket: port(),
@@ -28,6 +29,10 @@ defmodule Connection do
 
   def start_link(opts) do
     GenServer.start_link(__MODULE__, [], opts)
+  end
+
+  def ping(server) do
+    GenServer.call(server, :ping)
   end
 
   def init(_args) do
@@ -97,11 +102,19 @@ defmodule Connection do
 
     case Packet.parse_and_save(partial_item <> packet, writer) do
       :ok ->
+        if @tcp_response do
+          :gen_tcp.send(socket, "ok")
+        end
+
         {:noreply,
          [listen_socket, socket: socket, partial_item: "", writer: writer],
          @idle_timeout}
 
       {:ok, new_partial_item} ->
+        if @tcp_response do
+          :gen_tcp.send(socket, "ok")
+        end
+
         {:noreply,
          [
            listen_socket,
@@ -133,6 +146,10 @@ defmodule Connection do
 
   def handle_info({:tcp_error, _, reason}, state) do
     clean_and_restart_connection(state, reason)
+  end
+
+  def handle_call(:ping, _, [_, _, _, {:writer, writer}] = state) do
+    {:reply, Writer.ping(writer), state}
   end
 
   defp handle_accept_connection(

@@ -1,6 +1,6 @@
 use Mix.Config
 
-# config :logger, level: :info
+config :logger, level: :info
 
 config :nine_digits,
   ip: {127, 0, 0, 1},

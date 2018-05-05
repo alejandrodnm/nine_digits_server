@@ -8,6 +8,10 @@ defmodule Writer do
     GenServer.start_link(__MODULE__, [], opts)
   end
 
+  def ping(server) do
+    GenServer.call(server, :ping)
+  end
+
   def init(_args) do
     file =
       FileHandler.register()
@@ -23,5 +27,9 @@ defmodule Writer do
   def handle_cast({:append, item}, [file: file] = state) do
     IO.binwrite(file, item)
     {:noreply, state}
+  end
+
+  def handle_call(:ping, _, state) do
+    {:reply, :pong, state}
   end
 end

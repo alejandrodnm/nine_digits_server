@@ -12,10 +12,10 @@ defmodule NineDigits.Supervisor do
     children = [
       {Repo, name: Repo},
       {FileHandler, name: FileHandler},
-      Writer.Supervisor,
+      {Writer.Supervisor, name: Writer.Supervisor},
       {Stats, name: Stats},
       {Server, name: Server},
-      Connection.Supervisor
+      {Connection.Supervisor, name: Connection.Supervisor}
     ]
 
     Supervisor.init(children, strategy: :rest_for_one)

@@ -1,4 +1,4 @@
-defmodule Connection.PacketValidationTest do
+defmodule Connection.InvalidPacketTest do
   use ExUnit.Case
 
   setup do
