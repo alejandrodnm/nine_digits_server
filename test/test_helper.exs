@@ -2,6 +2,8 @@ ExUnit.start()
 ExUnit.configure(exclude: [:load_test])
 
 defmodule TestHelper do
+  import ExUnit.CaptureLog
+
   @doc """
   Restarts the application if it's not started, usefull for
   `on_exit` callbacks.
@@ -20,7 +22,9 @@ defmodule TestHelper do
   Restarts the application to clear the state
   """
   def clean_state do
-    :ok = Application.stop(:nine_digits)
-    :ok = Application.start(:nine_digits)
+    capture_log(fn ->
+      Application.stop(:nine_digits)
+      Application.start(:nine_digits)
+    end)
   end
 end

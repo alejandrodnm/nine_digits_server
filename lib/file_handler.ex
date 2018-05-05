@@ -1,6 +1,12 @@
 defmodule FileHandler do
   @moduledoc """
-  Process in charge of setting up and writting to the logger file
+  Takes care of initializing the `number.log` file on start and manages
+  the pool of `Writers`.
+
+  Whenever a `Writer` is initialized it sunbscribes itself to the
+  `FileHandler` by calling `register_writer/0`, after it's
+  registered, `Connection` workers can ask to be assigend a `Writer`
+  using `assign_writer/0` and can release them with `release_writer/0`.
   """
   use GenServer
 
@@ -32,18 +38,53 @@ defmodule FileHandler do
     end
   end
 
-  # Change name to register_worker
-  def register do
+  @doc """
+  Registers a new `Writer` to the pool
+  """
+  def register_writer do
     GenServer.call(__MODULE__, :register)
   end
 
-  # Change name to register
+  @doc """
+  Assigns a `Writer` to the calling process
+  """
   def assign_writer do
     GenServer.call(__MODULE__, :assign)
   end
 
-  def unregister do
-    GenServer.call(__MODULE__, :unregister)
+  @doc """
+  Releases the `Writer` associated to the calling process and moves it
+  to the free pool.
+  """
+  def release_writer do
+    GenServer.call(__MODULE__, :release)
+  end
+
+  @doc """
+  Returns a list with pool of unasigned `Writers`
+  """
+  def get_unasigned do
+    GenServer.call(__MODULE__, :unasigned)
+  end
+
+  def get_registered do
+    GenServer.call(__MODULE__, :registered)
+  end
+
+  def handle_call(
+        :unasigned,
+        _,
+        [_file, {:free, free}, _registered] = state
+      ) do
+    {:reply, free, state}
+  end
+
+  def handle_call(
+        :registered,
+        _,
+        [_file, _free, {:registered, registered}] = state
+      ) do
+    {:reply, registered, state}
   end
 
   def handle_call(
@@ -74,7 +115,7 @@ defmodule FileHandler do
   end
 
   def handle_call(
-        :unregister,
+        :release,
         {pid, _tag},
         file: file,
         free: free,

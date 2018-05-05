@@ -14,7 +14,7 @@ defmodule Writer do
 
   def init(_args) do
     file =
-      FileHandler.register()
+      FileHandler.register_writer()
       |> File.open!([:append, :delayed_write])
 
     {:ok, [file: file]}

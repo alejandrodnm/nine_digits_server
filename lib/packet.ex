@@ -62,7 +62,7 @@ defmodule Packet do
   `:error`
 
       iex> {:ok, writer} = Writer.start_link([])
-      iex> Packet.parse_and_save("123456789\nterminate\n987654321\n", writer)
+      iex> Packet.parse_and_save("123456789\nAinara\n987654321\n", writer)
       :error
       iex> :ets.match_object(:repo, :"_")
       [{123456789}]

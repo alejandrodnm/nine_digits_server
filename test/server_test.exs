@@ -18,7 +18,7 @@ defmodule SeverTest do
     ip: ip,
     port: port
   } do
-    Application.stop(:nine_digits)
+    capture_log(fn -> Application.stop(:nine_digits) end)
 
     {:ok, listen_socket} =
       :gen_tcp.listen(port, [

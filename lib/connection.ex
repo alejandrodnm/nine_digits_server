@@ -48,8 +48,8 @@ defmodule Connection do
      ]}
   end
 
-  def terminate(a, b) do
-    FileHandler.unregister()
+  def terminate(_, _) do
+    FileHandler.release_writer()
     :ok
   end
 
