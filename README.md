@@ -1,4 +1,4 @@
-# NineDigits
+# Nine Digits
 
 TCP server for reciving nine digits numbers
 

@@ -1,4 +1,4 @@
-defmodule Writter.Supervisor do
+defmodule Writer.Supervisor do
   @moduledoc """
   Supervises the concurrent tcp connections, if one fails is restarted
   so another user can connect.
@@ -18,7 +18,7 @@ defmodule Writter.Supervisor do
 
     children =
       for n <- 1..concurrency do
-        Supervisor.child_spec(Writter, id: {Writter, n})
+        Supervisor.child_spec(Writer, id: {Writer, n})
       end
 
     Supervisor.init(children, strategy: :one_for_one)

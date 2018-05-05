@@ -1,5 +1,7 @@
 defmodule SeverTest do
   use ExUnit.Case
+  doctest Server
+  import ExUnit.CaptureLog
 
   setup do
     ip = Application.get_env(:nine_digits, :ip)
@@ -26,10 +28,27 @@ defmodule SeverTest do
         ip: ip
       ])
 
-    {:error,
-     {{:shutdown, {:failed_to_start_child, Server, :timeout}},
-      {NineDigits.Application, :start, [:normal, []]}}} =
-      Application.start(:nine_digits)
+    log =
+      capture_log(fn ->
+        {:error,
+         {{:shutdown, {:failed_to_start_child, Server, :timeout}},
+          {NineDigits.Application, :start, [:normal, []]}}} =
+          Application.start(:nine_digits)
+      end)
+
+    assert String.contains?(
+             log,
+             "Couldn't open socket on ip #{Server.ip_to_str(ip)} and port #{
+               port
+             } retrying"
+           )
+
+    assert String.contains?(
+             log,
+             "Application nine_digits exited: " <>
+               "NineDigits.Application.start(:normal, []) returned an error: " <>
+               "shutdown: failed to start child: Server"
+           )
 
     :ok = :gen_tcp.close(listen_socket)
     :ok = Application.start(:nine_digits)

@@ -1,4 +1,4 @@
-defmodule Writter do
+defmodule Writer do
   @moduledoc """
   Process in charge of setting up and writting to the logger file
   """
@@ -9,15 +9,11 @@ defmodule Writter do
   end
 
   def init(_args) do
-    Process.send_after(self(), :started, 0)
-    {:ok, []}
-  end
+    file =
+      FileHandler.register()
+      |> File.open!([:append, :delayed_write])
 
-  def handle_info(:started, _) do
-    {:ok, file_path} = FileHandler.register()
-
-    file = File.open!(file_path, [:append, :delayed_write])
-    {:noreply, [file: file]}
+    {:ok, [file: file]}
   end
 
   def append_line(server, item) do

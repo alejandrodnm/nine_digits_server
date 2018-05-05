@@ -69,8 +69,15 @@ defmodule Server do
     {:reply, listen_socket, state}
   end
 
+  @doc """
+  Returns the string representation of an ip address tupple
+
+      iex> Server.ip_to_str({127, 0, 0, 1})
+      "127.0.0.1"
+
+  """
   @spec ip_to_str(tuple()) :: String.t()
-  defp ip_to_str(ip) do
+  def ip_to_str(ip) do
     ip
     |> Tuple.to_list()
     |> Enum.join(".")

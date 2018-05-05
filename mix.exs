@@ -14,7 +14,13 @@ defmodule NineDigits.MixProject do
         "coveralls.post": :test,
         "coveralls.html": :test
       ],
-      deps: deps()
+      deps: deps(),
+      # The main page in the docs
+      name: "Nine Digits",
+      docs: [
+        main: "readme",
+        extras: ["README.md"]
+      ]
     ]
   end
 
@@ -33,7 +39,8 @@ defmodule NineDigits.MixProject do
       {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
       {:excoveralls, "~> 0.8", only: :test},
       {:exprof, "~> 0.2.3", only: [:dev, :test]},
-      {:distillery, "~> 1.5", runtime: false}
+      {:distillery, "~> 1.5", runtime: false},
+      {:ex_doc, "~> 0.18", only: :dev, runtime: false}
     ]
   end
 end

@@ -12,7 +12,7 @@ defmodule NineDigits.Supervisor do
     children = [
       {Repo, name: Repo},
       {FileHandler, name: FileHandler},
-      Writter.Supervisor,
+      Writer.Supervisor,
       {Stats, name: Stats},
       {Server, name: Server},
       Connection.Supervisor

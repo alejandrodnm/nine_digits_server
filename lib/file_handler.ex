@@ -38,7 +38,7 @@ defmodule FileHandler do
   end
 
   # Change name to register
-  def assign_writter do
+  def assign_writer do
     GenServer.call(__MODULE__, :assign)
   end
 
@@ -54,23 +54,23 @@ defmodule FileHandler do
         registered: registered
       ) do
     new_state = [file: file, free: [pid | free], registered: registered]
-    {:reply, {:ok, file}, new_state}
+    {:reply, file, new_state}
   end
 
   def handle_call(
         :assign,
         {pid, _tag},
         file: file,
-        free: [writter | free],
+        free: [writer | free],
         registered: registered
       ) do
     new_state = [
       file: file,
       free: free,
-      registered: Map.put(registered, pid, writter)
+      registered: Map.put(registered, pid, writer)
     ]
 
-    {:reply, {:ok, writter}, new_state}
+    {:reply, writer, new_state}
   end
 
   def handle_call(
@@ -80,8 +80,8 @@ defmodule FileHandler do
         free: free,
         registered: registered
       ) do
-    {writter, new_registered} = Map.pop(registered, pid)
-    new_state = [file: file, free: [writter | free], registered: new_registered]
+    {writer, new_registered} = Map.pop(registered, pid)
+    new_state = [file: file, free: [writer | free], registered: new_registered]
     {:reply, :ok, new_state}
   end
 end
