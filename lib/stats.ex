@@ -1,6 +1,11 @@
+require Logger
+
 defmodule Stats do
   @moduledoc """
-  Handles the stats and reporting of the application
+  Handles the stats and reporting of the application. Every 10 seconds
+  it will timeout and write to `stdio` with the count of the newly
+  recived nine digits number, the count of newly received duplicates
+  and the total uniquer numbers.
   """
   use GenServer
   @timeout 10_000

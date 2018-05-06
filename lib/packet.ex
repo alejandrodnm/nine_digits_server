@@ -137,12 +137,12 @@ defmodule Packet do
     response
   end
 
-  @spec save_to_ets(String.t()) :: :ok
+  @spec save_to_ets(integer) :: :new | :duplicates
   defp save_to_ets(item) do
     if Repo.insert_new(item) do
       :new
     else
-      Repo.increase_counter(:duplicates)
+      Repo.increase_duplicates_counter()
       :duplicates
     end
   end

@@ -25,12 +25,16 @@ defmodule Writer do
     {:ok, [file: file]}
   end
 
-  def append_line(server, item) do
-    GenServer.cast(server, {:append, item <> "\n"})
+  @doc """
+  Writes the givem `text` to the file, adding a line break at the end.
+  """
+  @spec append_line(pid, String.t()) :: :ok
+  def append_line(server, text) do
+    GenServer.cast(server, {:append, text <> "\n"})
   end
 
-  def handle_cast({:append, item}, [file: file] = state) do
-    IO.binwrite(file, item)
+  def handle_cast({:append, text}, [file: file] = state) do
+    IO.binwrite(file, text)
     {:noreply, state}
   end
 

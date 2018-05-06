@@ -1,11 +1,11 @@
 defmodule Repo do
-  @moduledoc """
+  @moduledoc ~S"""
   Stores and manages writes of new items
 
   Creates two ets tables, `:repo` where the unique numbers are stored
-  and `:counter` that contains a single element:
-
-  {:counter, <new> integer, <duplicates> integer>}
+  and `:counter` that contains a single element, a tuple
+  `{:duplicates, integer()}` with the count of duplicate nine digits
+  items received.
   """
   use Agent
 
@@ -53,7 +53,7 @@ defmodule Repo do
   @doc """
   Inserts the item if it's not already on the table
   """
-  @spec insert_new(String.t()) :: boolean
+  @spec insert_new(integer) :: boolean
   def insert_new(item) do
     :ets.insert_new(:repo, {item})
   end
@@ -61,7 +61,8 @@ defmodule Repo do
   @doc """
   Increase the given counter by 1
   """
-  def increase_counter(:duplicates) do
+  @spec increase_duplicates_counter :: integer
+  def increase_duplicates_counter do
     :ets.update_counter(:counter, :duplicates, 1, {:duplicates, 0})
   end
 end

@@ -71,7 +71,7 @@ defmodule FileHandler do
   @doc """
   Returns the map of registerd pid -> `Writer`.
   """
-  @spec get_unasigned() :: %{required(pid) => pid}
+  @spec get_registered() :: %{required(pid) => pid}
   def get_registered do
     GenServer.call(__MODULE__, :registered)
   end
