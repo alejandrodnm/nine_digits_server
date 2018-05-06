@@ -9,6 +9,9 @@ run:
 tests:
 	docker run --rm --name nine_digits -v $(current_dir):/opt/nine_digits -it -e MIX_ENV=test nine_digits mix test
 
+lint:
+	docker run --rm --name nine_digits -v $(current_dir):/opt/nine_digits -it -e MIX_ENV=test nine_digits mix do credo, format --check-formatted
+
 coverage:
 	docker run --rm --name nine_digits -v $(current_dir):/opt/nine_digits -it -e MIX_ENV=test nine_digits mix coveralls
 
