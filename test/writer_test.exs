@@ -1,33 +1,40 @@
-# defmodule WriterTest do
-#   use ExUnit.Case
-#   import ExUnit.CaptureLog
+defmodule WriterTest do
+  use ExUnit.Case
 
-#   setup do
-#     file_path = Application.get_env(:nine_digits, :file_path)
-#     [file_path: file_path]
-#   end
+  setup do
+    TestHelper.clean_state()
+    writer = get_writer()
+    file_path = Application.get_env(:nine_digits, :file_path)
+    [file_path: file_path, writer: writer]
+  end
 
-#   test "appends an item to file", %{file_path: file_path} do
-#     TestHelper.clean_state()
-#     item = "item1"
-#     :ok = FileHandler.append_line(FileHandler, item)
-#     :pong = FileHandler.ping(FileHandler)
-#     {:ok, read_item} = File.read(file_path)
-#     assert item <> "\n" == read_item
-#   end
+  defp get_writer do
+    {{_, child, _, _}, _} =
+      Writer.Supervisor
+      |> Supervisor.which_children()
+      |> List.pop_at(0)
 
-#   test "appends 3 item to file", %{file_path: file_path} do
-#     TestHelper.clean_state()
+    child
+  end
 
-#     items =
-#       for n <- 1..3 do
-#         item = "item#{n}"
-#         :ok = FileHandler.append_line(FileHandler, item)
-#         item
-#       end
+  test "appends an item to file", %{file_path: file_path, writer: writer} do
+    item = "item1"
+    :ok = Writer.append_line(writer, item)
+    :pong = Writer.ping(writer)
+    {:ok, read_item} = File.read(file_path)
+    assert item <> "\n" == read_item
+  end
 
-#     :pong = FileHandler.ping(FileHandler)
-#     joined_items = Enum.join(items, "\n") <> "\n"
-#     {:ok, ^joined_items} = File.read(file_path)
-#   end
-# end
+  test "appends 3 item to file", %{file_path: file_path, writer: writer} do
+    items =
+      for n <- 1..3 do
+        item = "item#{n}"
+        :ok = Writer.append_line(writer, item)
+        item
+      end
+
+    :pong = Writer.ping(writer)
+    joined_items = Enum.join(items, "\n") <> "\n"
+    {:ok, ^joined_items} = File.read(file_path)
+  end
+end

@@ -14,4 +14,7 @@ config :nine_digits,
   # callback
   server_timeout: 200,
   # time to wait for receiving client messages before closing the connection.
-  idle_timeout: 100
+  idle_timeout: 100,
+  # Disable delayed_write so that we don't have to wait 2 secods to
+  # check every file write
+  file_options: []

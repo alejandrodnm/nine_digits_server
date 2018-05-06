@@ -31,6 +31,7 @@ defmodule Connection do
     GenServer.start_link(__MODULE__, [], opts)
   end
 
+  @doc false
   def ping(server) do
     GenServer.call(server, :ping)
   end

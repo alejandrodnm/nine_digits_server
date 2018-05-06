@@ -39,14 +39,14 @@ defmodule FileHandler do
   end
 
   @doc """
-  Registers a new `Writer` to the pool
+  Registers a new `Writer` to the pool.
   """
   def register_writer do
     GenServer.call(__MODULE__, :register)
   end
 
   @doc """
-  Assigns a `Writer` to the calling process
+  Assigns a `Writer` to the calling process.
   """
   def assign_writer do
     GenServer.call(__MODULE__, :assign)
@@ -61,12 +61,17 @@ defmodule FileHandler do
   end
 
   @doc """
-  Returns a list with pool of unasigned `Writers`
+  Returns a list with the pool of unasigned `Writers`.
   """
+  @spec get_unasigned() :: list(pid)
   def get_unasigned do
     GenServer.call(__MODULE__, :unasigned)
   end
 
+  @doc """
+  Returns the map of registerd pid -> `Writer`.
+  """
+  @spec get_unasigned() :: %{required(pid) => pid}
   def get_registered do
     GenServer.call(__MODULE__, :registered)
   end

@@ -4,10 +4,15 @@ defmodule Writer do
   """
   use GenServer
 
+  @file_options Application.get_env(:nine_digits, :file_options, [
+                  :delayed_write
+                ])
+
   def start_link(opts) do
     GenServer.start_link(__MODULE__, [], opts)
   end
 
+  @doc false
   def ping(server) do
     GenServer.call(server, :ping)
   end
@@ -15,7 +20,7 @@ defmodule Writer do
   def init(_args) do
     file =
       FileHandler.register_writer()
-      |> File.open!([:append, :delayed_write])
+      |> File.open!([:append] ++ @file_options)
 
     {:ok, [file: file]}
   end
