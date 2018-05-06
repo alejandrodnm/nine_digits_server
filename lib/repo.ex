@@ -1,6 +1,6 @@
 defmodule Repo do
   @moduledoc ~S"""
-  Stores and manages writes of new items
+  Stores and manages writes of new items.
 
   Creates two ets tables, `:repo` where the unique numbers are stored
   and `:counter` that contains a single element, a tuple
@@ -33,7 +33,7 @@ defmodule Repo do
   end
 
   @doc """
-  Returns the new and duplicates counters and resets them
+  Returns the new and duplicates counters and resets them.
   """
   @spec take_duplicates :: integer
   def take_duplicates do
@@ -43,7 +43,7 @@ defmodule Repo do
   end
 
   @doc """
-  Returns the number of unique numbers stored in the table
+  Returns the number of unique numbers stored in the table.
   """
   @spec get_unique_count :: integer
   def get_unique_count do
@@ -51,7 +51,7 @@ defmodule Repo do
   end
 
   @doc """
-  Inserts the item if it's not already on the table
+  Inserts the item if it's not already on the table.
   """
   @spec insert_new(integer) :: boolean
   def insert_new(item) do
@@ -59,7 +59,7 @@ defmodule Repo do
   end
 
   @doc """
-  Increase the given counter by 1
+  Increase the given counter by 1.
   """
   @spec increase_duplicates_counter :: integer
   def increase_duplicates_counter do

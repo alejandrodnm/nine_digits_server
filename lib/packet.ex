@@ -39,7 +39,7 @@ defmodule Packet do
       iex> :ets.match_object(:repo, :"_")
       [{123456789}]
 
-  Duplicate messages are not stored an increase the duplicate counter
+  Duplicate messages are not stored an increase the duplicate counter.
 
       iex> {:ok, writer} = Writer.start_link([])
       iex> Packet.parse_and_save("123456789\n123456789\n123456789\n", writer)
@@ -50,7 +50,7 @@ defmodule Packet do
       [duplicates: 2]
 
   Receiving the message "terminate" breaks the process and returns
-  `:terminate`
+  `:terminate`.
 
       iex> {:ok, writer} = Writer.start_link([])
       iex> Packet.parse_and_save("123456789\nterminate\n987654321\n", writer)
@@ -59,7 +59,7 @@ defmodule Packet do
       [{123456789}]
 
   Receiving an incorrect message breaks the process and returns
-  `:error`
+  `:error`.
 
       iex> {:ok, writer} = Writer.start_link([])
       iex> Packet.parse_and_save("123456789\nAinara\n987654321\n", writer)
@@ -76,7 +76,7 @@ defmodule Packet do
     #
     # If it's incomplete "123456789\r\n12" -> ["123456789", "12"]. This
     # will help us pattern match the end of the list on complete or
-    # incomplete messages
+    # incomplete messages.
     split = Regex.split(~r/(\r\n|\n)/, packet)
     parse(:ok, split, writer, [])
   end

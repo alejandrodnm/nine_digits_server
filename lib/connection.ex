@@ -49,6 +49,9 @@ defmodule Connection do
      ]}
   end
 
+  @doc """
+  Releases the writer and terminates.
+  """
   def terminate(_, _) do
     FileHandler.release_writer()
     :ok
@@ -185,7 +188,7 @@ defmodule Connection do
     end
   end
 
-  # Accept connection or timeout after 4 seconds
+  # Accept connection or timeout after 4 seconds.
   @spec accept_connection(port()) :: {:ok, port()} | {:error, atom}
   defp accept_connection(listen_socket) do
     case :gen_tcp.accept(listen_socket, 4000) do

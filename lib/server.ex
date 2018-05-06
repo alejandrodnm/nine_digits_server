@@ -54,7 +54,7 @@ defmodule Server do
   end
 
   @doc """
-  Returns the listen socket used for accepting connections
+  Returns the listen socket used for accepting connections,
   """
   @spec listen_socket(GenServer.server()) :: port()
   def listen_socket(server) do
@@ -70,7 +70,7 @@ defmodule Server do
   end
 
   @doc """
-  Returns the string representation of an ip address tupple
+  Returns the string representation of an ip address tupple.
 
       iex> Server.ip_to_str({127, 0, 0, 1})
       "127.0.0.1"

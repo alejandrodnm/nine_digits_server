@@ -1,6 +1,6 @@
 defmodule NineDigits.Supervisor do
   @moduledoc """
-  Top level supervisor
+  Top level supervisor.
   """
   use Supervisor
 

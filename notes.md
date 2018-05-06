@@ -11,6 +11,8 @@
 - gonna try sharding and removing trailing zeros. It made no difference
 - Write from multiple processes
 - Rely on Nagle's algorithm for buffering writes after processing
+- Slow tests because we need to make sure that the process wrote to the file
+and there are some async processes
 
 # Perf
 

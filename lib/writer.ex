@@ -1,6 +1,6 @@
 defmodule Writer do
   @moduledoc """
-  Process in charge of setting up and writting to the logger file
+  Process in charge of setting up and writting to the logger file.
   """
   use GenServer
 
