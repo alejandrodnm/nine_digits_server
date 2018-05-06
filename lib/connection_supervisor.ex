@@ -11,7 +11,7 @@ defmodule Connection.Supervisor do
 
   @doc """
   Starts as many connection proccesses as the concurrency level.
-  The concurrency level is set in the config and defaults to 5
+  The concurrency level is set in the config and defaults to 5.
   """
   def init(:ok) do
     concurrency = Application.get_env(:nine_digits, :concurrency, 5)
