@@ -4,7 +4,7 @@ build:
 	docker build -t nine_digits .
 
 run:
-	docker run --rm --name nine_digits -v $(current_dir):/opt/nine_digits -p 4000:4000 -it nine_digits mix run --no-halt
+	docker run --rm --name nine_digits -v $(current_dir):/opt/nine_digits -p 4000:4000 -it nine_digits mix do clean --only prod, run --no-halt
 
 tests:
 	docker run --rm --name nine_digits -v $(current_dir):/opt/nine_digits -it -e MIX_ENV=test nine_digits mix test
@@ -26,6 +26,3 @@ docs:
 
 clean:
 	docker rmi nine_digits
-
-release:
-	docker run --rm --name nine_digits -v $(current_dir):/opt/nine_digits -it nine_digits mix release

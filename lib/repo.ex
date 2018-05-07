@@ -9,27 +9,30 @@ defmodule Repo do
   """
   use Agent
 
-  def start_link(_opts) do
-    Agent.start_link(fn ->
-      repo =
-        :ets.new(:repo, [
-          :set,
-          :public,
-          :named_table,
-          {:write_concurrency, true}
-        ])
+  def start_link(opts) do
+    Agent.start_link(
+      fn ->
+        repo =
+          :ets.new(:repo, [
+            :set,
+            :public,
+            :named_table,
+            {:write_concurrency, true}
+          ])
 
-      counter =
-        :ets.new(:counter, [
-          :set,
-          :public,
-          :named_table,
-          {:write_concurrency, true}
-        ])
+        counter =
+          :ets.new(:counter, [
+            :set,
+            :public,
+            :named_table,
+            {:write_concurrency, true}
+          ])
 
-      :ets.insert(:counter, {:duplicates, 0})
-      [repo: repo, counter: counter]
-    end)
+        :ets.insert(:counter, {:duplicates, 0})
+        [repo: repo, counter: counter]
+      end,
+      opts
+    )
   end
 
   @doc """

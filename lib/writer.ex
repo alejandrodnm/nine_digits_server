@@ -34,7 +34,7 @@ defmodule Writer do
   end
 
   def handle_cast({:append, text}, [file: file] = state) do
-    IO.binwrite(file, text)
+    :ok = IO.binwrite(file, text)
     {:noreply, state}
   end
 
