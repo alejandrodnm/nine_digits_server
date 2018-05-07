@@ -1,7 +1,6 @@
 defmodule Writer.Supervisor do
   @moduledoc """
-  Supervises the concurrent tcp connections, if one fails is restarted
-  so another user can connect.
+  Supervises the pool of `Writer`.
   """
   use Supervisor
 
@@ -10,7 +9,7 @@ defmodule Writer.Supervisor do
   end
 
   @doc """
-  Starts as many connection proccesses as the concurrency level.
+  Starts as many `Writer` proccesses as the concurrency level.
   The concurrency level is set in the config and defaults to 5
   """
   def init(:ok) do
@@ -18,7 +17,10 @@ defmodule Writer.Supervisor do
 
     children =
       for n <- 1..concurrency do
-        Supervisor.child_spec(Writer, id: {Writer, n})
+        %{
+          id: {Writer, n},
+          start: {Writer, :start_link, [[name: String.to_atom("Writer#{n}")]]}
+        }
       end
 
     Supervisor.init(children, strategy: :one_for_one)

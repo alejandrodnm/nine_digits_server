@@ -2,7 +2,8 @@ require Logger
 
 defmodule Server do
   @moduledoc """
-  TCP server for receiving nine digits messages.
+  TCP server for receiving nine digits messages. It just binds the
+  socket, the client connections are handle by the `Connection` module.
   """
   use GenServer
   @timeout Application.get_env(:nine_digits, :server_timeout, 5000)

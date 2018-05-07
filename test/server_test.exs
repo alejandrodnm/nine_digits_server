@@ -31,7 +31,9 @@ defmodule SeverTest do
     log =
       capture_log(fn ->
         {:error,
-         {{:shutdown, {:failed_to_start_child, Server, :timeout}},
+         {{:shutdown,
+           {:failed_to_start_child, Server.Supervisor,
+            {:shutdown, {:failed_to_start_child, Server, :timeout}}}},
           {NineDigits.Application, :start, [:normal, []]}}} =
           Application.start(:nine_digits)
       end)

@@ -1,6 +1,8 @@
 defmodule Writer do
   @moduledoc """
-  Process in charge of setting up and writting to the logger file.
+  Process in charge of setting up and writting to the file. They map
+  1 to 1 to the `Connection`s and are referenced directly by the
+  named registry.
   """
   use GenServer
 
@@ -19,8 +21,10 @@ defmodule Writer do
 
   def init(_args) do
     file =
-      FileHandler.register_writer()
-      |> File.open!([:append] ++ @file_options)
+      File.open!(
+        Application.get_env(:nine_digits, :file_path),
+        [:append] ++ @file_options
+      )
 
     {:ok, [file: file]}
   end

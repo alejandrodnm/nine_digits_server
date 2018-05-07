@@ -1,0 +1,21 @@
+version: '3.3'
+services:
+  server:
+    build: .
+    ports:
+      - "4000:4000"
+    volumes:
+      - type: bind
+        source: ./
+        target: /opt/nine_digits
+  client:
+    depends_on:
+      - server
+    command: elixir test/load.exs
+    build: .
+    environment:
+      NINE_DIGITS_HOST: server
+    volumes:
+      - type: bind
+        source: ./
+        target: /opt/nine_digits

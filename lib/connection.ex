@@ -8,9 +8,9 @@ defmodule Connection do
   this is to avoid blocking forever in case the supervisor sends it
   a message.
 
-  This module is in charge of requesting a `Writer` to the `FileHandler`
-  module an keeps it in it's state, this is to increase throughput when
-  writing to disk.
+  For every `Connection` there will be one `Writer` for writing to disk,
+  the mapping will be done per process id, meaning that `ConnectionN`
+  will forward all the valid data to `WriterN` to write to disk.
 
   Once a connection is established with a client if `@idle_timeout`
   (defaults to 5000) ms pass without receiving a message, the connection
@@ -27,8 +27,8 @@ defmodule Connection do
            writer: pid
          ]
 
-  def start_link(opts) do
-    GenServer.start_link(__MODULE__, [], opts)
+  def start_link(opts, id) do
+    GenServer.start_link(__MODULE__, id, opts)
   end
 
   @doc false
@@ -36,8 +36,8 @@ defmodule Connection do
     GenServer.call(server, :ping)
   end
 
-  def init(_args) do
-    writer = FileHandler.assign_writer()
+  def init(id) do
+    writer = String.to_atom("Writer#{id}")
     send(self(), :accept_connection)
 
     {:ok,
@@ -47,14 +47,6 @@ defmodule Connection do
        partial_item: "",
        writer: writer
      ]}
-  end
-
-  @doc """
-  Releases the writer and terminates.
-  """
-  def terminate(_, _) do
-    FileHandler.release_writer()
-    :ok
   end
 
   @doc """

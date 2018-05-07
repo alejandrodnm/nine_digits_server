@@ -91,6 +91,6 @@ defmodule Connection.ValidPacketTest do
         assert_receive :terminate
       end)
 
-    assert log =~ ~r/GenServer #PID<\d+.\d+.\d+> terminating/
+    assert log =~ ~r/GenServer :Connection\d terminating/
   end
 end

@@ -18,7 +18,12 @@ defmodule Connection.Supervisor do
 
     children =
       for n <- 1..concurrency do
-        Supervisor.child_spec(Connection, id: {Connection, n})
+        %{
+          id: {Connection, n},
+          start:
+            {Connection, :start_link,
+             [[name: String.to_atom("Connection#{n}")], n]}
+        }
       end
 
     Supervisor.init(children, strategy: :one_for_one, max_restarts: 6)

@@ -1,4 +1,4 @@
-defmodule FileHandlerTest do
+defmodule RepoTest do
   use ExUnit.Case
   import ExUnit.CaptureLog
 
@@ -15,15 +15,5 @@ defmodule FileHandlerTest do
     Application.start(:nine_digits)
     assert File.exists?(file_path)
     {:ok, ""} = File.read(file_path)
-  end
-
-  test "register, assign and release a writter" do
-    FileHandler.register_writer()
-    assert FileHandler.get_unasigned() == [self()]
-    assert FileHandler.assign_writer() == self()
-    assert FileHandler.get_unasigned() == []
-    assert self() == FileHandler.get_registered() |> Map.get(self())
-    FileHandler.release_writer()
-    assert FileHandler.get_unasigned() == [self()]
   end
 end

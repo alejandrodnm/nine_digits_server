@@ -38,7 +38,6 @@ defmodule NineDigits.MixProject do
       {:credo, "~> 0.9", only: [:dev, :test]},
       {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
       {:excoveralls, "~> 0.8", only: :test},
-      {:distillery, "~> 1.5", runtime: false},
       {:ex_doc, "~> 0.18", only: :dev, runtime: false}
     ]
   end

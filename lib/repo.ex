@@ -6,12 +6,23 @@ defmodule Repo do
   and `:counter` that contains a single element, a tuple
   `{:duplicates, integer()}` with the count of duplicate nine digits
   items received.
+
+  On init it cleans the file that keeps the list of unique numbers.
   """
   use Agent
 
   def start_link(opts) do
     Agent.start_link(
       fn ->
+        # Delete the file that holds the results. The `Writer`s will
+        # create it on init.
+        file_path = Application.get_env(:nine_digits, :file_path)
+
+        case File.rm(file_path) do
+          {:error, :enoent} -> :ok
+          :ok -> :ok
+        end
+
         repo =
           :ets.new(:repo, [
             :set,

@@ -13,7 +13,7 @@ those installed the project has a Docker image and a Makefile to execute
 `mix` tasks with Docker:
 
 - **build**: creates the Docker image.
-- **clean**: deletes the docker image.
+- **clean**: deletes the docker images.
 - **run** - `mix do clean --only prod, run --no-halt`: executes the program.
 - **tests** - `mix test`: runs the tests.
 - **lint** - `mix do credo, format --check-formatted`: runs code checks with
@@ -25,6 +25,9 @@ coverage in the `./cover` directory.
 - first time it is run it takes a couple of minutes to build the Persistent
 Lookup Table (PLT), but they should be already included in the `_build` directory.
 - **docs** - `mix docs`: generates the html documentation.
+- **load-test**: runs a load test using `docker-compose`, it creates two
+containers, one that runs the server listening on port 4000, and
+another that creates 5 connections and starts sending random data to the server.
 
 ## Asumptions
 

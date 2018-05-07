@@ -4,4 +4,4 @@ ENV MIX_ENV prod
 WORKDIR /opt/nine_digits
 RUN mix local.hex --force
 RUN mix local.rebar --force
-CMD ["mix", "run", "--no-halt"]
+CMD mix do clean --only prod, deps.get --only prod, compile, run --no-halt
