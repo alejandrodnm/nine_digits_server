@@ -11,9 +11,9 @@ defmodule NineDigits.Supervisor do
   def init(:ok) do
     children = [
       {Repo, name: Repo},
+      {Stats, name: Stats},
       {Writer.Supervisor, name: Writer.Supervisor},
-      {Server.Supervisor, name: Server.Supervisor},
-      {Stats, name: Stats}
+      {Server.Supervisor, name: Server.Supervisor}
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

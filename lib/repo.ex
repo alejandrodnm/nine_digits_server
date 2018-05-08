@@ -65,7 +65,8 @@ defmodule Repo do
   end
 
   @doc """
-  Inserts the item if it's not already on the table.
+  Inserts `item` if it's not already on the table. If `item` was
+  inserted returns `true` otherwise returns `false`.
   """
   @spec insert_new(integer) :: boolean
   def insert_new(item) do
@@ -73,7 +74,7 @@ defmodule Repo do
   end
 
   @doc """
-  Increase the given counter by 1.
+  Increase the duplicates counter by 1.
   """
   @spec increase_duplicates_counter :: integer
   def increase_duplicates_counter do
